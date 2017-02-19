@@ -13,12 +13,12 @@
     "owners": [ "Deveel" ],
     "tags": [ "workflow", "dotnet", "core", "activity", "activities", "job", "graph" ],
     "summary": "A lightweight library for designing and executing workflows through .NET",
-    "licenseUrl": "https://raw.githubusercontent.com/deveel/dflow/master/LICENSE"
+    "licenseUrl": "https://raw.githubusercontent.com/deveel/dflow/master/LICENSE",
+    "projectUrl": "https://github.com/deveel/dflow"
   },
 
   "authors": [ "Antonello Provenzano" ],
   "copyright": "2017 Deveel",
-  "projectUrl": "https://github.com/deveel/dflow",
 
   "frameworks": {
     "netstandard1.6": {
