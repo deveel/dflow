@@ -10,6 +10,7 @@
       "type": "git",
       "url": "https://github.com/deveel/dflow.git"
     },
+    "iconUrl": "https://github.com/deveel/dflow/raw/master/assets/nuget-icon.png",
     "owners": [ "Deveel" ],
     "tags": [ "workflow", "dotnet", "core", "activity", "activities", "job", "graph" ],
     "summary": "A lightweight library for designing and executing workflows through .NET",
