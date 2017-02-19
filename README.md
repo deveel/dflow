@@ -1,6 +1,22 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/7rqkmoa5ij5hm2an?svg=true)](https://ci.appveyor.com/project/Deveel/dflow)
+
 # DFlow
 
 This is a lightweight library, with no aim to be an enterprise-level solution, to easily design in-code workflows to operate from an initial state to a final state.
+
+## Install
+
+### Nightly Builds
+
+Add the following sources to NuGet
+https://www.myget.org/F/dflow/api/v3/index.json
+https://www.myget.org/F/dflow/api/v2
+
+In the Package Manager consoler type
+
+```
+PM> Install-Package Deveel.Workflows
+```
 
 ## Workflows
 
