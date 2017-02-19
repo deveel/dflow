@@ -1,9 +1,24 @@
 ﻿{
-  "version": "1.0.0-*",
+  "version": "0.7.2-*",
 
   "dependencies": {
     "NETStandard.Library": "1.6.0"
   },
+
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/deveel/dflow.git"
+    },
+    "owners": [ "Deveel" ],
+    "tags": [ "workflow", "dotnet", "core", "activity", "activities", "job", "graph" ],
+    "summary": "A lightweight library for designing and executing workflows through .NET",
+    "licenseUrl": "https://raw.githubusercontent.com/deveel/dflow/master/LICENSE"
+  },
+
+  "authors": [ "Antonello Provenzano" ],
+  "copyright": "2017 Deveel",
+  "projectUrl": "https://github.com/deveel/dflow",
 
   "frameworks": {
     "netstandard1.6": {
