@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/7rqkmoa5ij5hm2an?svg=true)](https://ci.appveyor.com/project/Deveel/dflow)
+[![Build status](https://ci.appveyor.com/api/projects/status/7rqkmoa5ij5hm2an?svg=true)](https://ci.appveyor.com/project/Deveel/dflow) [![MyGet Version](https://img.shields.io/myget/dflow/v/Deveel.Workflows.svg?label=DFlow+at+MyGet)](https://www.myget.org/feed/dflow/package/nuget/Deveel.Workflows) [![NuGet Version](https://img.shields.io/nuget/v/Deveel.Workflows.svg?label=DFlow+at+NuGet)](https://www.nuget.org/packages/Deveel.Workflows)
 
 # DFlow
 
@@ -6,17 +6,31 @@ This is a lightweight library, with no aim to be an enterprise-level solution, t
 
 ## Install
 
-### Nightly Builds
+- **NuGet**
+    
+    In the Package Manager console type
+    
+    ```
+    PM> Install-Package Deveel.Workflows
+    ```
+    Or 
+    
+    ```
+    PM> Install-Package Deveel.Workflows -Pre
+    ```
+    
+    to obtain the pre-released packages
+    
+- **Nightly Builds**
 
-Add the following sources to NuGet
-https://www.myget.org/F/dflow/api/v3/index.json
-https://www.myget.org/F/dflow/api/v2
+    Add the following sources to NuGet
+    https://www.myget.org/F/dflow/api/v3/index.json | https://www.myget.org/F/dflow/api/v2
 
-In the Package Manager consoler type
+    In the Package Manager console type
 
-```
-PM> Install-Package Deveel.Workflows
-```
+    ```
+    PM> Install-Package Deveel.Workflows
+    ```
 
 ## Workflows
 
