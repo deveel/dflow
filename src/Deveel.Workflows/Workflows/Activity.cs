@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -9,6 +11,7 @@ namespace Deveel.Workflows {
 		private Func<State, bool> decision;
 		private Func<State, CancellationToken, Task<State>> execution;
 		private string name;
+		private Dictionary<string, object> meta;
 
 		public Activity() 
 			: this(null) {
@@ -27,28 +30,51 @@ namespace Deveel.Workflows {
 			this.decision = decision;
 			this.execution = execution;
 
+			meta = new Dictionary<string, object>();
 			errorList = new List<ExecuteError>();
+
+			EnsureMetadata();
 		}
 
 		public virtual string ActivityName => FindName();
 
 		string IComponent.Name => ActivityName;
 
-		private string FindName() {
-			if (!String.IsNullOrEmpty(name))
-				return name;
+		public IEnumerable<KeyValuePair<string, object>> Metadata => meta.AsEnumerable();
 
-			// TODO: find an attribute
+		private void EnsureMetadata() {
+			FindMetadataFromAttributes();
+			GetMetadata(meta);
+		}
+
+		private void FindMetadataFromAttributes() {
+			var typeInfo = GetType().GetTypeInfo();
+			var attributes = typeInfo.GetCustomAttributes<ActivityMetadataAttribute>();
+			foreach (var attribute in attributes) {
+				meta[attribute.Key] = attribute.Value;
+			}
+		}
+
+		private string FindName() {
+			var result = name;
+
+			if (!String.IsNullOrEmpty(result))
+				return result;
+
+			result = this.GetMetadata<string>(KnownActivityMetadataKeys.Name);
+
+			if (!String.IsNullOrEmpty(result))
+				return result;
 
 			return GetType().Name;
 		}
 
-		protected void AddError(ExecuteError error) {
-			errorList.Add(error);
+		protected virtual void GetMetadata(IDictionary<string, object> metadata) {
+			
 		}
 
-		bool IActivity.CanExecute(State state) {
-			return CanExecute(state);
+		protected void AddError(ExecuteError error) {
+			errorList.Add(error);
 		}
 
 		protected virtual bool CanExecute(State state) {

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using NUnit.Framework;
@@ -194,5 +195,34 @@ namespace Deveel.Workflows {
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(100, final.Value);
 		}
+
+		[Test]
+		public void UseTypedActivity() {
+			var builder = Workflow.Build(workflow => workflow
+			.Activity<AddTenActivity>()
+			.Activity<AddTenActivity>());
+
+			var flow = builder.Build();
+			var final = flow.Execute(new State(23));
+
+			Assert.IsNotNull(final);
+			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.AreEqual(43, final.Value);
+			Assert.AreEqual("[begin]->addTen->addTen", final.PathString);
+		}
+
+		#region AddTenActivity
+
+		class AddTenActivity : Activity<int, int> {
+			public override string ActivityName {
+				get { return "addTen"; }
+			}
+
+			protected override Task<int> ExecuteValueAsync(int input, CancellationToken cancellationToken) {
+				return Task.FromResult(input + 10);
+			}
+		}
+
+		#endregion
 	}
 }

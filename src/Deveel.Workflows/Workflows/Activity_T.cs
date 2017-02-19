@@ -3,9 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows {
-	public class Activity<TInput, TOutput> : Activity
-		where TInput : class
-		where TOutput : class {
+	public class Activity<TInput, TOutput> : Activity {
 
 		public Activity()
 			: base() {
