@@ -1,10 +1,10 @@
 {
-  "version": "1.0.0-*",
+  "version": "0.7.*",
 
   "testRunner": "nunit",
 
   "dependencies": {
-    "Deveel.Workflows": "1.0.0-*",
+    "Deveel.Workflows": "0.7.*",
     "NETStandard.Library": "1.6.0",
     "NUnit": "3.6.0",
     "dotnet-test-nunit": "3.4.0-beta-3" 
