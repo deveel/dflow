@@ -135,9 +135,9 @@ namespace Deveel.Workflows {
 			Assert.IsTrue(final.IsParallel);
 
 			Assert.IsInstanceOf<IEnumerable<State>>(final.Value);
-			Assert.AreEqual(2, final.AsParallel().Object.Length);
-			Assert.AreEqual(23, final.AsParallel().Object[0]);
-			Assert.AreEqual(27, final.AsParallel().Object[1]);
+			Assert.AreEqual(2, final.AsParallel().Value.Length);
+			Assert.AreEqual(23, final.AsParallel().Value[0]);
+			Assert.AreEqual(27, final.AsParallel().Value[1]);
 			Assert.AreEqual("[begin]->seed->pbranch[addOne,addFive]", final.PathString);
 		}
 
