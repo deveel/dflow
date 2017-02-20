@@ -28,5 +28,30 @@ namespace Deveel.Workflows {
 			var meta = state.GetMetadata<string>("key1");
 			Assert.AreEqual("overridden", meta);
 		}
+
+		[Test]
+		public void TransportValue() {
+			var state = new State("foo");
+			state = state.New("first");
+			state = state.New("second");
+
+			Assert.IsNotNull(state.Value);
+			Assert.IsFalse(state.HasNewValue);
+			Assert.AreEqual("foo", state.Value);
+		}
+
+		[Test]
+		public void TransportNewValue() {
+			var state = new State();
+			state = state.New("first").SetValue("foo");
+
+			Assert.IsTrue(state.HasNewValue);
+
+			state = state.New("second");
+
+			Assert.IsNotNull(state.Value);
+			Assert.IsFalse(state.HasNewValue);
+			Assert.AreEqual("foo", state.Value);
+		}
 	}
 }
