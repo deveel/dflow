@@ -78,9 +78,8 @@ var builder = Workflow.Build(workflow => workflow               // 1.
     .Activity(activity => activity                              // 3.
         .Named("do")                                            // 4.
         .If(state => state.Value is bool && (bool)c.Value)      // 5.
-        .Execute((state, token) => {                            // 6.
+        .Execute(state => {                                     // 6.
             Console.WriteLine("Hello!"); 
-            return Task.CompletedTask;
          })
      .Branch(branch => branch                                   // 7.
         .Named("branch1")                                       // 8.
@@ -101,7 +100,7 @@ Th code above gives a general idea of a building model, and the possibilities ar
 3. Defines dynamically an activity using a builder
 4. Gives the name ("do") to the dynamically defined activity: an activity should always be named and activity builders require the definition of the name
 5. Specifies a condition to met for the activity to be executed: it takes a `State` object ar input
-6. The code to be executed if the condition is met: it takes a `State` and a `CancellationToken` parameters and must return a `Task<State>` as result (potentially, in the future, alternatives will be provided to this for making more dynamic kind of results)
+6. The code to be executed if the condition is met: this overload takes a `State` parameter and is executed synchronously; other overloads allow to execute asynchronous operations and provide a CancellationToken parameter
 7. Creates a branch within the workflow
 8. Gives a name to the branch: being components of a workflow, branches should be named (the builder model requires the specification of a name for branches)
 9. Defines the strategy of execution of the branch: by default, the strategy applies is `Sequential`, so it is possible to change it to other strategies
