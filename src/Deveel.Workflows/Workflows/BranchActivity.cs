@@ -35,7 +35,7 @@ namespace Deveel.Workflows {
 		}
 
 		protected override State NextState(State previous) {
-			return previous.GetNextBranch(this);
+			return previous.NewBranch(this);
 		}
 
 		protected override Task<State> ExecuteCurrentStateAsync(State state, CancellationToken cancellationToken) {

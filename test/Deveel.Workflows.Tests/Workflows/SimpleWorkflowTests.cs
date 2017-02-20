@@ -59,7 +59,7 @@ namespace Deveel.Workflows {
 				}, {
 					"world2",
 					state => state.Value.ToString() != "Hello World!",
-					state => state.GetNext("world2").SetValue(state.Value)
+					state => state.New("world2").SetValue(state.Value)
 				}
 			};
 

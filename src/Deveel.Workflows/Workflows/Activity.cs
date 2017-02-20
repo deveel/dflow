@@ -96,7 +96,7 @@ namespace Deveel.Workflows {
 		}
 
 		protected virtual State NextState(State previous) {
-			return previous.GetNext(this);
+			return previous.New(this);
 		}
 
 		public async Task<State> ExecuteAsync(State state, CancellationToken cancellationToken) {

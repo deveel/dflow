@@ -99,17 +99,17 @@ namespace Deveel.Workflows {
 			return this;
 		}
 
-		public State GetNext(IComponent component) {
+		public State New(IComponent component) {
 			var state = new State(this, component);
 			Next = state;
 			return state;
 		}
 
-		public State GetNext(string component) {
-			return GetNext(new VirtualComponent(component));
+		public State New(string component) {
+			return New(new VirtualComponent(component));
 		}
 
-		public State GetNextBranch(IComponent component) {
+		public State NewBranch(IComponent component) {
 			var state = new BranchState(this, component);
 			Next = state;
 			return state;
@@ -124,6 +124,19 @@ namespace Deveel.Workflows {
 
 		public bool IsBranch => this is BranchState;
 
+		public object GetMetadata(string key) {
+			var current = this;
+			while (current != null) {
+				object obj;
+				if (current.Metadata.TryGetValue(key, out obj))
+					return obj;
+
+				current = current.Previous;
+			}
+
+			return null;
+		}
+
 		public T GetMetadata<T>(string key) {
 			var current = this;
 			while (current != null) {
@@ -134,6 +147,18 @@ namespace Deveel.Workflows {
 			}
 
 			return default(T);
+		}
+
+		public bool HasMetadata(string key) {
+			var current = this;
+			while (current != null) {
+				if (current.Metadata.HasValue(key))
+					return true;
+
+				current = current.Previous;
+			}
+
+			return false;
 		}
 
 		public void SetMetadata(string key, object value) {
