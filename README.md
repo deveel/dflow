@@ -85,12 +85,10 @@ var builder = Workflow.Build(workflow => workflow               // 1.
         .Named("branch1")                                       // 8.
         .InParallel()                                           // 9.
         .Activity<PActivity1>()                                 // 10.
-        .Activity<PActivity2>()
-        .Merge(BranchMergeStrategy.Instance)));                 // 11.
+        .Activity<PActivity2>())
+     .Merge(BranchMergeStrategy.Instance));                     // 11.
         
-/// The context object here the an activation context provideed 
-/// by the infrastructure to resolve the instance of activities
-var workflow = builder.Build(context);
+var workflow = builder.Build();                                 // 12.
 ```
 
 Th code above gives a general idea of a building model, and the possibilities are many more than those presented above, but in the specific:
@@ -106,3 +104,4 @@ Th code above gives a general idea of a building model, and the possibilities ar
 9. Defines the strategy of execution of the branch: by default, the strategy applies is `Sequential`, so it is possible to change it to other strategies
 10. Attaches a user-defined activity `PActivity1` to the branch that will be executed in parallel with the other activities
 11. Because the branch execution strategy defined is `Parallel`, the resulting `State` will be a container of the states resulted from the parallel execution of the activities in the branch; this activity merges the states into a single state, using a user-defined strategy (`BranchMergeStrategy.Instance`) for merging the values of the states
+12. The builder builds a Workflow object using a default IBuildContext (that constructs Activity references with a simple constructor): to build workflows with more advanced service resolving, a new implemenation of IBuildContext is required.
