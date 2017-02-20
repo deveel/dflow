@@ -21,6 +21,10 @@ namespace Deveel.Workflows {
 			return builder.Activity(x => x.Proxy(activity));
 		}
 
+		public static IBranchBuilder Branch(this IBranchBuilder builder, Action<IBranchBuilder> branch) {
+			return builder.Activity(activity => activity.Branch(branch));
+		}
+
 		public static IBranchBuilder Merge(this IBranchBuilder builder, string name, IMergeStrategy strategy) {
 			return builder.Activity(activity => activity.Merge(name, strategy));
 		}

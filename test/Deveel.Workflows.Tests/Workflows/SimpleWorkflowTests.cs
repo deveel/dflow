@@ -81,7 +81,8 @@ namespace Deveel.Workflows {
 					"sbranch", BranchStrategies.Sequential,
 					new Activity("addOne", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 1))),
 					new Activity("addFive", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 5)))
-				}
+				},
+				{"merge", MergeStrategies.New(values => values.Cast<int>().Sum(x => x))}
 			};
 
 			var final = await workflow.ExecuteAsync();
@@ -90,7 +91,7 @@ namespace Deveel.Workflows {
 			Assert.IsNotNull(final.Value);
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(28, final.Value);
-			Assert.AreEqual("[begin]->seed->sbranch->addOne->addFive", final.PathString);
+			Assert.AreEqual("[begin]->seed->sbranch[addOne,addFive]->merge", final.PathString);
 		}
 
 		[Test]
@@ -107,16 +108,16 @@ namespace Deveel.Workflows {
 
 			var final = await workflow.ExecuteAsync();
 
-			Assert.IsInstanceOf<ParallelState>(final);
+			Assert.IsInstanceOf<BranchState>(final);
 			Assert.IsNotNull(final);
 			Assert.IsNotNull(final.Value);
-			Assert.IsTrue(final.IsParallel);
+			Assert.IsTrue(final.IsBranch);
 
 			Assert.IsInstanceOf<IEnumerable<State>>(final.Value);
-			Assert.AreEqual(2, final.AsParallel().Value.Length);
-			Assert.AreEqual(23, final.AsParallel().Value[0]);
-			Assert.AreEqual(27, final.AsParallel().Value[1]);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne,addFive]", final.PathString);
+			Assert.AreEqual(2, final.AsBranch().Value.Length);
+			Assert.AreEqual(23, final.AsBranch().Value[0]);
+			Assert.AreEqual(27, final.AsBranch().Value[1]);
+			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]", final.PathString);
 		}
 
 		[Test]
@@ -138,7 +139,7 @@ namespace Deveel.Workflows {
 			Assert.IsNotNull(final.Value);
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(50, final.Value);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne,addFive]->merge", final.PathString);
+			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]->merge", final.PathString);
 		}
 
 		[Test]
@@ -151,7 +152,8 @@ namespace Deveel.Workflows {
 					new Activity("addOne", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 1))),
 					new Activity("addFive", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 5)))
 				},
-				{ "checkRepeat", RepeatDecision.New(state => (int)state.Value < 100) }
+				{"merge", MergeStrategies.New(values => values.Cast<int>().Sum(x => x))},
+				{"checkRepeat", RepeatDecision.New(state => (int) state.Value < 100)}
 			};
 
 			var final = await workflow.ExecuteAsync();

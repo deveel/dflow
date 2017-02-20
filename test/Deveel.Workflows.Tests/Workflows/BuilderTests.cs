@@ -97,7 +97,8 @@ namespace Deveel.Workflows {
 						.Execute(state => state.SetValue((int) state.Value + 1)))
 					.Activity(activity => activity
 						.Named("addFive")
-						.Execute(state => state.SetValue((int) state.Value + 5)))));
+						.Execute(state => state.SetValue((int) state.Value + 5))))
+				.Merge("merge", values => values.Cast<int>().Sum(x => x)));
 
 			var flow = builder.Build();
 
@@ -107,7 +108,7 @@ namespace Deveel.Workflows {
 			Assert.IsNotNull(final.Value);
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(28, final.Value);
-			Assert.AreEqual("[begin]->seed->sbranch->addOne->addFive", final.PathString);
+			Assert.AreEqual("[begin]->seed->sbranch[addOne,addFive]->merge", final.PathString);
 		}
 
 		[Test]
@@ -130,16 +131,16 @@ namespace Deveel.Workflows {
 
 			var final = flow.Execute();
 
-			Assert.IsInstanceOf<ParallelState>(final);
+			Assert.IsInstanceOf<BranchState>(final);
 			Assert.IsNotNull(final);
 			Assert.IsNotNull(final.Value);
-			Assert.IsTrue(final.IsParallel);
+			Assert.IsTrue(final.IsBranch);
 
 			Assert.IsInstanceOf<IEnumerable<State>>(final.Value);
-			Assert.AreEqual(2, final.AsParallel().Value.Length);
-			Assert.AreEqual(23, final.AsParallel().Value[0]);
-			Assert.AreEqual(27, final.AsParallel().Value[1]);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne,addFive]", final.PathString);
+			Assert.AreEqual(2, final.AsBranch().Value.Length);
+			Assert.AreEqual(23, final.AsBranch().Value[0]);
+			Assert.AreEqual(27, final.AsBranch().Value[1]);
+			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]", final.PathString);
 		}
 
 		[Test]
@@ -167,7 +168,7 @@ namespace Deveel.Workflows {
 			Assert.IsNotNull(final.Value);
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(50, final.Value);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne,addFive]->merge", final.PathString);
+			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]->merge", final.PathString);
 		}
 
 		[Test]
@@ -184,7 +185,8 @@ namespace Deveel.Workflows {
 					.Activity(activity => activity
 						.Named("addFive")
 						.Execute(state => state.SetValue((int) state.Value + 5))))
-				.Repeat("checkRepeat", state => (int)state.Value < 100));
+				.Merge("merge", values => values.Cast<int>().Sum(x => x))
+				.Repeat("checkRepeat", state => (int) state.Value < 100));
 
 			var flow = builder.Build();
 
@@ -199,8 +201,8 @@ namespace Deveel.Workflows {
 		[Test]
 		public void UseTypedActivity() {
 			var builder = Workflow.Build(workflow => workflow
-			.Activity<AddTenActivity>()
-			.Activity<AddTenActivity>());
+				.Activity<AddTenActivity>()
+				.Activity<AddTenActivity>());
 
 			var flow = builder.Build();
 			var final = flow.Execute(new State(23));
@@ -209,6 +211,34 @@ namespace Deveel.Workflows {
 			Assert.IsFalse(final.StateInfo.Failed);
 			Assert.AreEqual(43, final.Value);
 			Assert.AreEqual("[begin]->addTen->addTen", final.PathString);
+		}
+
+		[Test]
+		public void MixBranchingAndMerge() {
+			var builder = Workflow.Build(workflow => workflow
+				.Activity(activity => activity
+					.Named("seed")
+					.Execute(state => state.SetValue(11)))
+				.Branch(branch => branch
+					.Named("branch")
+					.InParallel()
+					.Branch(branch1 => branch1
+						.Named("b1")
+						.Activity<AddTenActivity>()
+						.Activity<AddTenActivity>())      // here the value is 31
+					.Branch(branch2 => branch2
+						.Named("b2")
+						.Activity<AddTenActivity>()
+						.Activity<AddTenActivity>()))   // here the value is 31
+				.Merge("merge", values => values.Cast<State[]>().Select(x => x.Sum(y => (int)y.Value)).Sum(x => x)));	// 31 + 31
+
+			var flow = builder.Build();
+			var final = flow.Execute();
+
+			Assert.IsNotNull(final);
+			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.AreEqual(62, final.Value);
+			Assert.AreEqual("[begin]->seed->branch[b1[addTen,addTen]|b2[addTen,addTen]]->merge", final.PathString);
 		}
 
 		#region AddTenActivity

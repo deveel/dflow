@@ -36,6 +36,12 @@ namespace Deveel.Workflows {
 					current = await activity.ExecuteAsync(current, cancellationToken);
 				}
 
+				if (state.IsBranch) {
+					state.SetValue(new[] {current});
+
+					return state;
+				}
+
 				return current;
 			}
 		}

@@ -58,8 +58,20 @@ namespace Deveel.Workflows {
 			}
 		}
 
+		private static string GetComponentName(IComponent component) {
+			var name = component.Name;
+			if (component is IBranch) {
+				var branch = (IBranch)component;
+				var sep = branch.Strategy.IsParallel ? "|" : ",";
+				var children = String.Join(sep, branch.Activities.Select(GetComponentName));
+				name = String.Format("{0}[{1}]", name, children);
+			}
+
+			return name;
+		}
+
 		private static string GetStateName(State state) {
-			var name = state.IsEntry ? "[begin]" : state.StateInfo.Component.Name;
+			var name = state.IsEntry ? "[begin]" : GetComponentName(state.StateInfo.Component);
 			if (String.IsNullOrEmpty(name))
 				name = "<unnamed activity>";
 
@@ -72,12 +84,6 @@ namespace Deveel.Workflows {
 			var current = this;
 			while (current != null) {
 				var name = GetStateName(current);
-
-				if (current is ParallelState) {
-					name = String.Format("{0}[{1}]", name, 
-						String.Join(",", current.AsParallel().States.Select(GetStateName)));
-				}
-
 				names.Add(name);
 
 				current = current.Previous;
@@ -103,20 +109,20 @@ namespace Deveel.Workflows {
 			return GetNext(new VirtualComponent(component));
 		}
 
-		public State GetNextParallel(IComponent component) {
-			var state = new ParallelState(this, component);
+		public State GetNextBranch(IComponent component) {
+			var state = new BranchState(this, component);
 			Next = state;
 			return state;
 		}
 
-		public ParallelState AsParallel() {
-			if (!(this is ParallelState))
+		public BranchState AsBranch() {
+			if (!(this is BranchState))
 				throw new InvalidCastException();
 
-			return (ParallelState) this;
+			return (BranchState) this;
 		}
 
-		public bool IsParallel => this is ParallelState;
+		public bool IsBranch => this is BranchState;
 
 		#region VirtualComponent
 

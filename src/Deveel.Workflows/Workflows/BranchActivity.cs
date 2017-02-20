@@ -35,10 +35,7 @@ namespace Deveel.Workflows {
 		}
 
 		protected override State NextState(State previous) {
-			if (Strategy.IsParallel)
-				return previous.GetNextParallel(this);
-
-			return base.NextState(previous);
+			return previous.GetNextBranch(this);
 		}
 
 		protected override Task<State> ExecuteCurrentStateAsync(State state, CancellationToken cancellationToken) {

@@ -18,8 +18,8 @@ namespace Deveel.Workflows {
 			while (current != null) {
 				states.Add(current);
 
-				if (current.IsParallel) {
-					foreach (var inner in current.AsParallel().States) {
+				if (current.IsBranch) {
+					foreach (var inner in current.AsBranch().States) {
 						states.Add(inner);
 					}
 				}

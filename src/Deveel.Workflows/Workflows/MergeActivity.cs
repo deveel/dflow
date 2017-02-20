@@ -15,7 +15,7 @@ namespace Deveel.Workflows {
 		public IMergeStrategy Strategy { get; }
 
 		protected override Task<State> ExecuteCurrentStateAsync(State state, CancellationToken cancellationToken) {
-			var branchState = state.Previous as ParallelState;
+			var branchState = state.Previous as BranchState;
 			if (branchState == null)
 				throw new NotSupportedException("The previous state was not of a branch activity");
 
