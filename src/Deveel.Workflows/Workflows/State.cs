@@ -124,6 +124,22 @@ namespace Deveel.Workflows {
 
 		public bool IsBranch => this is BranchState;
 
+		public T GetMetadata<T>(string key) {
+			var current = this;
+			while (current != null) {
+				if (current.Metadata.HasValue(key))
+					return current.Metadata.GetValue<T>(key);
+
+				current = current.Previous;
+			}
+
+			return default(T);
+		}
+
+		public void SetMetadata(string key, object value) {
+			Metadata[key] = value;
+		} 
+
 		#region VirtualComponent
 
 		class VirtualComponent : IComponent {
