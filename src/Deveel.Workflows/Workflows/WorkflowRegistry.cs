@@ -123,6 +123,10 @@ namespace Deveel.Workflows {
 			if (String.IsNullOrEmpty(name))
 				return null;
 
+			if (!builders.ContainsKey(name) &&
+				!workflows.ContainsKey(name))
+				throw new InvalidOperationException($"The selector has returned the name of flow '{name}' that is not registered");
+
 			return GetWorkflow(name);
 		}
 
