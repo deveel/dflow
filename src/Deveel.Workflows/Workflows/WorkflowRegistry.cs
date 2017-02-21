@@ -3,19 +3,32 @@ using System.Collections.Generic;
 using System.Threading;
 
 namespace Deveel.Workflows {
-	public abstract class WorkflowRegistry : IDisposable {
+	public class WorkflowRegistry : IDisposable {
 		private bool initialied;
 		private bool disposed;
 		private Dictionary<string, IWorkflowBuilder> builders;
 		private Dictionary<string, Workflow> workflows;
 
-		protected WorkflowRegistry(IBuildContext context) {
+		public WorkflowRegistry(IBuildContext context) 
+			: this(context, null) {
+		}
+
+		public WorkflowRegistry(IWorkflowSelector selector) 
+			: this(null, selector) {
+		}
+
+		public WorkflowRegistry(IBuildContext context, IWorkflowSelector selector) {
 			Context = context;
+			Selector = selector;
 
 			builders = new Dictionary<string, IWorkflowBuilder>();
 			workflows = new Dictionary<string, Workflow>();
 
 			EnsureInitialized();
+		}
+
+		public WorkflowRegistry()
+			: this(null, null) {
 		}
 
 		~WorkflowRegistry() {
@@ -24,7 +37,11 @@ namespace Deveel.Workflows {
 
 		protected IBuildContext Context { get; }
 
-		protected abstract void Initialize();
+		protected  IWorkflowSelector Selector { get; }
+
+		protected virtual void Initialize() {
+			
+		}
 
 		private void EnsureInitialized() {
 			if (!initialied) {
@@ -38,7 +55,7 @@ namespace Deveel.Workflows {
 				throw new ObjectDisposedException(GetType().Name);
 		}
 
-		protected void Register(string name, Action<IWorkflowBuilder> workflow) {
+		public void Register(string name, Action<IWorkflowBuilder> workflow) {
 			ThrowIfDisposed();
 
 			if (String.IsNullOrEmpty(name))
@@ -53,7 +70,7 @@ namespace Deveel.Workflows {
 			builders[name] = builder;
 		}
 
-		protected void Register(string name, Workflow workflow) {
+		public void Register(string name, Workflow workflow) {
 			ThrowIfDisposed();
 
 			if (workflow == null)
@@ -68,7 +85,14 @@ namespace Deveel.Workflows {
 		}
 
 		public IWorkflow GetWorkflow(string name) {
+			return GetWorkflow(Context, name);
+		}
+
+		public IWorkflow GetWorkflow(IBuildContext context, string name) {
 			ThrowIfDisposed();
+
+			if (context == null)
+				throw new ArgumentNullException(nameof(context));
 
 			if (String.IsNullOrEmpty(name))
 				throw new ArgumentNullException(nameof(name));
@@ -83,7 +107,27 @@ namespace Deveel.Workflows {
 			if (!builders.TryGetValue(name, out builder))
 				return null;
 
-			return builder.Build(Context);
+			return builder.Build(context);
+		}
+
+		public IWorkflow GetWorkflow(State state) {
+			ThrowIfDisposed();
+
+			if (state == null)
+				throw new ArgumentNullException(nameof(state));
+
+			if (Selector == null)
+				throw new NotSupportedException();
+
+			var name = Selector.SelectWorkflow(state);
+			if (String.IsNullOrEmpty(name))
+				return null;
+
+			return GetWorkflow(name);
+		}
+
+		public IWorkflow GetWorkflow(object value) {
+			return GetWorkflow(new State(value));
 		}
 
 		public void Dispose() {

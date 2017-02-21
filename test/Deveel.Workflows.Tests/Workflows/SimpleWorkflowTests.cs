@@ -163,33 +163,5 @@ namespace Deveel.Workflows {
 			Assert.IsInstanceOf<int>(final.Value);
 			Assert.AreEqual(100, final.Value);
 		}
-
-		[Test]
-		public async Task ReportTests() {
-			var workflow = new Workflow {
-				{
-					"seed", state => state.SetValue(22)
-				}, {
-					"sbranch", BranchStrategies.Sequential,
-					new Activity("addOne", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 1))),
-					new Activity("addFive", (state, token) => Task.FromResult(state.SetValue((int) state.Value + 5)))
-				},
-				{"merge", MergeStrategies.New(values => values.Cast<int>().Sum(x => x))},
-				{"checkRepeat", RepeatDecision.New(state => (int) state.Value < 100)}
-			};
-
-			var final = await workflow.ExecuteAsync();
-
-			var report = final.GetReport();
-
-			Assert.IsNotNull(report);
-			Assert.IsNotEmpty(report.Nodes);
-
-			var nodes = report.Nodes.ToList();
-			Assert.AreEqual(4, nodes.Count);
-
-			Assert.AreEqual("seed", nodes[0].ComponentName);
-			Assert.IsTrue(nodes[1].Branch);
-		}
 	}
 }
