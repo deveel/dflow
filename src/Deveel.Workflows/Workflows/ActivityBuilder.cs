@@ -1,16 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Deveel.Workflows.Graph;
+
 namespace Deveel.Workflows {
-	class ActivityBuilder : IActivityBuilder, INamedActivityBuilder, IConditionalActivityBuilder {
+	class ActivityBuilder : IActivityBuilder, INamedActivityBuilder, IConditionalActivityBuilder, IExecutionNodeBuilder {
 		private string Name { get; set; }
+
+		private Dictionary<string, object> Metadata { get; set; }
 
 		private Func<State, bool> Decision { get; set; }
 
 		private Type ActivityType { get; set; }
 
-		private IBranchBuilder BranchBuilder { get; set; }
+		private BranchBuilder BranchBuilder { get; set; }
 
 		private IActivity ProxyActivity { get; set; }
 
@@ -25,6 +30,14 @@ namespace Deveel.Workflows {
 
 		public INamedActivityBuilder Named(string name) {
 			Name = name;
+			return this;
+		}
+
+		public INamedActivityBuilder With(string key, object metadata) {
+			if (Metadata == null)
+				Metadata = new Dictionary<string, object>();
+
+			Metadata[key] = metadata;
 			return this;
 		}
 
@@ -45,9 +58,32 @@ namespace Deveel.Workflows {
 				activity = BranchBuilder.Build(context);
 			} else {
 				activity = new Activity(Name, Decision, Execution);
+
+				if (Metadata != null) {
+					((Activity)activity).SetMetadata(Metadata);
+				}
 			}
 
 			return activity;
+		}
+
+		public ExecutionNode BuildNode() {
+			if (!OptionSet)
+				throw new InvalidOperationException();
+
+			ExecutionNode node;
+
+			if (ActivityType != null) {
+				throw new NotImplementedException();
+			} else if (ProxyActivity != null) {
+				node = new ComponentNode(ProxyActivity);
+			} else if (BranchBuilder != null) {
+				node = BranchBuilder.BuildNode();
+			} else {
+				node = new BuilderNode(Name, Decision != null, Metadata);
+			}
+
+			return node;
 		}
 
 		public IConditionalActivityBuilder If(Func<State, bool> decision) {
@@ -84,6 +120,10 @@ namespace Deveel.Workflows {
 
 			Execution = execution;
 			OptionSet = true;
+		}
+
+		public IExecutionNode BuildGraphNode() {
+			throw new NotImplementedException();
 		}
 	}
 }

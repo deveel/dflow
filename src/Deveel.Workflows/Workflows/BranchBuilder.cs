@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
+
+using Deveel.Workflows.Graph;
 
 namespace Deveel.Workflows {
-	class BranchBuilder : IBranchBuilder {
+	class BranchBuilder : IBranchBuilder, IExecutionNodeBuilder {
 		public BranchBuilder() {
-			Activities = new List<IActivityBuilder>();
+			Activities = new List<ActivityBuilder>();
 			Strategy = BranchStrategies.Sequential;
 		}
 
@@ -14,9 +15,11 @@ namespace Deveel.Workflows {
 
 		private IBranchStrategy Strategy { get; set; }
 
-		private List<IActivityBuilder> Activities { get; set; }
+		private List<ActivityBuilder> Activities { get; set; }
 
 		private Func<State, bool> Decision { get; set; }
+
+		private IDictionary<string, object> Metadata { get; set; }
 
 		public IBranchBuilder Named(string name) {
 			Name = name;
@@ -56,6 +59,12 @@ namespace Deveel.Workflows {
 				throw new InvalidOperationException();
 
 			return new BranchActivity(Name, Decision, Strategy, activities);
+		}
+
+		public ExecutionNode BuildNode() {
+			return new BuilderNode(Name, Decision != null, Metadata) {
+				InnerNodes = Activities.Select(x => x.BuildNode())
+			};
 		}
 	}
 }

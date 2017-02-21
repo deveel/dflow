@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Deveel.Workflows {
+namespace Deveel.Workflows.Graph {
 	public sealed class ExecutionReport {
 		private readonly List<ReportNode> nodes;
 

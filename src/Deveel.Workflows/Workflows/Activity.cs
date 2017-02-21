@@ -12,6 +12,7 @@ namespace Deveel.Workflows {
 		private Func<State, CancellationToken, Task<State>> execution;
 		private string name;
 		private Dictionary<string, object> meta;
+		private bool? hasDecision;
 
 		public Activity() 
 			: this(null) {
@@ -42,6 +43,35 @@ namespace Deveel.Workflows {
 
 		public IEnumerable<KeyValuePair<string, object>> Metadata => meta.AsEnumerable();
 
+		public virtual bool HasDecision => FindHasDecision();
+
+
+		private bool FindHasDecision() {
+			if (hasDecision == null) {
+				if (decision != null) {
+					hasDecision = true;
+				} else if (this.HasMetadata(KnownActivityMetadataKeys.Decides)) {
+					hasDecision = this.GetMetadata<bool>(KnownActivityMetadataKeys.Decides);
+				} else {
+					hasDecision = OverridesCanExecute();
+				}
+			}
+
+			return hasDecision.Value;
+		}
+
+		private bool OverridesCanExecute() {
+			var activityType = typeof(Activity).GetTypeInfo();
+			var thisType = GetType();
+
+			var methods = activityType.FindMembers(MemberTypes.Method,
+				BindingFlags.NonPublic | BindingFlags.Instance,
+				(info, criteria) => info is MethodInfo && info.Name == nameof(CanExecute),
+				null);
+
+			return methods.Any(x => x.DeclaringType == thisType && thisType != activityType.AsType());
+		}
+
 		private void EnsureMetadata() {
 			FindMetadataFromAttributes();
 			GetMetadata(meta);
@@ -71,6 +101,10 @@ namespace Deveel.Workflows {
 
 		protected virtual void GetMetadata(IDictionary<string, object> metadata) {
 			
+		}
+
+		internal void SetMetadata(IEnumerable<KeyValuePair<string, object>> metadata) {
+			meta = metadata.ToDictionary(x => x.Key, y => y.Value);
 		}
 
 		protected void AddError(ExecuteError error) {

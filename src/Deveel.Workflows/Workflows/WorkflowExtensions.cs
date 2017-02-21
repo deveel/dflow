@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 
+using Deveel.Workflows.Graph;
+
 namespace Deveel.Workflows {
 	public static class WorkflowExtensions {
 		public static Task<State> ExecuteAsync(this IWorkflow workflow, State state, CancellationToken cancellationToken) {

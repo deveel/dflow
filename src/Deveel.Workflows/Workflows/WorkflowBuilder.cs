@@ -2,12 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Deveel.Workflows.Graph;
+
 namespace Deveel.Workflows {
-	class WorkflowBuilder : IWorkflowBuilder {
-		private List<IActivityBuilder> builders;
+	class WorkflowBuilder : IWorkflowBuilder, IExecutionNodeBuilder {
+		private List<ActivityBuilder> builders;
 
 		public WorkflowBuilder() {
-			builders = new List<IActivityBuilder>();
+			builders = new List<ActivityBuilder>();
 		}
 
 		public IWorkflowBuilder Activity(Action<IActivityBuilder> activity) {
@@ -28,6 +30,12 @@ namespace Deveel.Workflows {
 			}
 
 			return workflow;
+		}
+
+		public ExecutionNode BuildNode() {
+			return new BuilderNode(null, false, new KeyValuePair<string, object>[0]) {
+				InnerNodes = builders.Select(x => x.BuildNode())
+			};
 		}
 	}
 }

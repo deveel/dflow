@@ -9,12 +9,23 @@ namespace Deveel.Workflows {
 			return metadata?.ContainsKey(key) ?? false;
 		}
 
+		public static bool HasValue(this IEnumerable<KeyValuePair<string, object>> metadata, string key) {
+			var dict = metadata as IDictionary<string, object>;
+			if (dict == null)
+				dict = metadata.ToDictionary(x => x.Key, y => y.Value, StringComparer.Ordinal);
+
+			return dict.HasValue(key);
+		}
+
 		public static T GetValue<T>(this IEnumerable<KeyValuePair<string, object>> metadata, string key) {
 			if (metadata == null)
 				return default(T);
 
-			return metadata.ToDictionary(x => x.Key, y => y.Value, StringComparer.Ordinal)
-				.GetValue<T>(key);
+			var dict = metadata as IDictionary<string, object>;
+			if (dict == null)
+				dict = metadata.ToDictionary(x => x.Key, y => y.Value, StringComparer.Ordinal);
+
+			return dict.GetValue<T>(key);
 		}
 
 		public static T GetValue<T>(this IDictionary<string, object> metadata, string key) {

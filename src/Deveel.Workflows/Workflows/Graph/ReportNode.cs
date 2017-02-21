@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Deveel.Workflows {
+namespace Deveel.Workflows.Graph {
 	public sealed class ReportNode {
 		private readonly State state;
 

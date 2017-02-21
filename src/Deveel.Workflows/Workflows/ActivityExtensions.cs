@@ -7,5 +7,9 @@ namespace Deveel.Workflows {
 		public static T GetMetadata<T>(this IActivity activity, string key) {
 			return activity.Metadata.GetValue<T>(key);
 		}
+
+		public static bool HasMetadata(this IActivity activity, string key) {
+			return activity.Metadata.HasValue(key);
+		}
 	}
 }
