@@ -14,6 +14,10 @@ namespace Deveel.Workflows.Graph {
 
 		private IComponent Component { get; }
 
+		public override bool IsBranch => Component is IBranch;
+
+		public override bool IsParallel => IsBranch && ((IBranch) Component).Strategy.IsParallel;
+
 		public override string Name => Component.Name;
 
 		public override bool HasDecision { get; }

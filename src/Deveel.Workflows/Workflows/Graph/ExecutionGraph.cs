@@ -9,6 +9,10 @@ namespace Deveel.Workflows.Graph {
 
 		string IExecutionNode.Name => null;
 
+		bool IExecutionNode.IsBranch => true;
+
+		bool IExecutionNode.IsParallel => false;
+
 		IExecutionNode IExecutionNode.Previous => null;
 
 		IExecutionNode IExecutionNode.Next => null;

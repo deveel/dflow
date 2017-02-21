@@ -1,25 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Deveel.Workflows.Graph
-{
-    abstract class ExecutionNode : IExecutionNode
-    {
-	    protected ExecutionNode() {
-		    InnerNodes = new List<ExecutionNode>();
-	    }
+namespace Deveel.Workflows.Graph {
+	abstract class ExecutionNode : IExecutionNode {
+		protected ExecutionNode() {
+			InnerNodes = new List<ExecutionNode>();
+		}
 
-	    public abstract string Name { get; }
+		public abstract string Name { get; }
 
-	    public virtual bool HasDecision => false;
+		public virtual bool IsBranch => false;
 
-	    public IExecutionNode Previous { get; private set; }
+		public virtual bool IsParallel => false;
 
-	    public IExecutionNode Next { get; private set; }
+		public virtual bool HasDecision => false;
 
-	    public abstract IDictionary<string, object> Metadata { get; }
+		public IExecutionNode Previous { get; private set; }
 
-	    public virtual IEnumerable<IExecutionNode> Nodes => InnerNodes;
+		public IExecutionNode Next { get; private set; }
+
+		public abstract IDictionary<string, object> Metadata { get; }
+
+		public virtual IEnumerable<IExecutionNode> Nodes => InnerNodes;
 
 		public IEnumerable<ExecutionNode> InnerNodes { get; set; }
 

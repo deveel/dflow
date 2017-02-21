@@ -11,18 +11,11 @@ namespace Deveel.Workflows.Graph {
 
 		public IEnumerable<ReportNode> Nodes => nodes.AsReadOnly();
 
-		public static ExecutionReport Build(State finalState) {
+		internal static ExecutionReport Build(State finalState) {
 			var states = new List<State>();
 			State current = finalState;
 			while (current != null) {
 				states.Add(current);
-
-				if (current.IsBranch) {
-					foreach (var inner in current.AsBranch().States) {
-						states.Add(inner);
-					}
-				}
-
 				current = current.Previous;
 			}
 

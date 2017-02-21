@@ -51,6 +51,8 @@ namespace Deveel.Workflows {
 		public IBranchActivity Build(IBuildContext context) {
 			if (Activities.Count == 0)
 				throw new InvalidOperationException("At least one activity must be defined in a branch");
+			if (Strategy == null)
+				throw new InvalidOperationException();
 
 			var activities = Activities.Select(x => x.Build(context)).ToList();
 
@@ -62,7 +64,10 @@ namespace Deveel.Workflows {
 		}
 
 		public ExecutionNode BuildNode() {
-			return new BuilderNode(Name, Decision != null, Metadata) {
+			if (Strategy == null)
+				throw new InvalidOperationException();
+
+			return new BuilderNode(Name, Decision != null, true, Strategy.IsParallel, Metadata) {
 				InnerNodes = Activities.Select(x => x.BuildNode())
 			};
 		}

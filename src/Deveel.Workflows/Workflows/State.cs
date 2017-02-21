@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Deveel.Workflows.Graph;
+
 namespace Deveel.Workflows {
 	public class State {
 		public State() 
@@ -163,7 +165,11 @@ namespace Deveel.Workflows {
 
 		public void SetMetadata(string key, object value) {
 			Metadata[key] = value;
-		} 
+		}
+
+		public ExecutionReport GetReport() {
+			return ExecutionReport.Build(this);
+		}
 
 		#region VirtualComponent
 

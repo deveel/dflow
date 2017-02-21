@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Deveel.Workflows.Graph {
 	public sealed class ReportNode {
@@ -30,5 +31,10 @@ namespace Deveel.Workflows.Graph {
 		public bool Failed => state.StateInfo.Failed;
 
 		public IEnumerable<ExecuteError> Errors => state.StateInfo.Errors;
+
+		public bool Branch => state.IsBranch;
+
+		public IEnumerable<ReportNode> Nodes => 
+			state.IsBranch ? state.AsBranch().States.Select(x => new ReportNode(x)) : new ReportNode[0];
 	}
 }

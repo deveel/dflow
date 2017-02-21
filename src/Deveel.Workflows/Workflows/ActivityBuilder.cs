@@ -80,7 +80,7 @@ namespace Deveel.Workflows {
 			} else if (BranchBuilder != null) {
 				node = BranchBuilder.BuildNode();
 			} else {
-				node = new BuilderNode(Name, Decision != null, Metadata);
+				node = new BuilderNode(Name, Decision != null, false, false, Metadata);
 			}
 
 			return node;

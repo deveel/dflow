@@ -4,13 +4,15 @@ using System.Linq;
 
 namespace Deveel.Workflows.Graph {
 	class BuilderNode : ExecutionNode {
-		public BuilderNode(string name, IEnumerable<KeyValuePair<string, object>> metadata) 
-			: this(name, false, metadata) {
+		public BuilderNode(string name, bool branch, bool parallel, IEnumerable<KeyValuePair<string, object>> metadata) 
+			: this(name, false, branch, parallel, metadata) {
 		}
 
-		public BuilderNode(string name, bool decision, IEnumerable<KeyValuePair<string, object>> metadata) {
+		public BuilderNode(string name, bool decision, bool branch, bool parallel, IEnumerable<KeyValuePair<string, object>> metadata) {
 			Name = name;
 			HasDecision = decision;
+			IsBranch = branch;
+			IsParallel = parallel;
 
 			Metadata = new Dictionary<string, object>();
 
@@ -26,6 +28,10 @@ namespace Deveel.Workflows.Graph {
 		public override IDictionary<string, object> Metadata { get; }
 
 		public override bool HasDecision { get; }
+
+		public override bool IsBranch { get; }
+
+		public override bool IsParallel { get; }
 
 		public static IEnumerable<IExecutionNode> BuildChain(IEnumerable<ExecutionNode> nodes) {
 			var list = nodes.ToList();

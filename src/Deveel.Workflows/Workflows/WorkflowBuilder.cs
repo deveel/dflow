@@ -33,7 +33,7 @@ namespace Deveel.Workflows {
 		}
 
 		public ExecutionNode BuildNode() {
-			return new BuilderNode(null, false, new KeyValuePair<string, object>[0]) {
+			return new BuilderNode(null, false, true, false, new KeyValuePair<string, object>[0]) {
 				InnerNodes = builders.Select(x => x.BuildNode())
 			};
 		}

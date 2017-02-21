@@ -105,5 +105,23 @@ namespace Deveel.Workflows {
 			Assert.IsNotNull(nodes[2]);
 			Assert.IsNotEmpty(nodes[2].Nodes);
 		}
+
+		[Test]
+		public void InspectMeta() {
+			var workflow = Workflow.Build(builder => builder
+				.Activity(x => x
+					.Named("a")
+					.Execute(state => state.SetValue("foo")))
+				.Activity(x => x
+					.Named("b")
+					.If(state => state.Value is string)
+					.Execute(state => state.SetValue((string) state.Previous.Value + " bar")))
+				.Branch(branch => branch.Named("b1")
+					.Activity(x => x
+						.Named("a")
+						.Execute(state => state.SetValue(state.Previous.Value)))));
+
+			var graph = workflow.Graph().Nodes.ToList();
+		}
 	}
 }

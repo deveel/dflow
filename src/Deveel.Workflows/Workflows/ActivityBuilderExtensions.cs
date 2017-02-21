@@ -3,6 +3,10 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows {
 	public static class ActivityBuilderExtensions {
+		public static void OfType<TActivity>(this IActivityBuilder builder) where TActivity : class, IActivity {
+			builder.OfType(typeof(TActivity));
+		}
+
 		public static void Merge(this IActivityBuilder builder, string name, IMergeStrategy strategy) {
 			builder.Proxy(new MergeActivity(name, strategy));
 		}

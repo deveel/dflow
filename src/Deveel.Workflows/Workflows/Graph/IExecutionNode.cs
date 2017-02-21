@@ -1,11 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
-namespace Deveel.Workflows {
+namespace Deveel.Workflows.Graph {
 	public interface IExecutionNode {
 		string Name { get; }
 
 		bool HasDecision { get; }
+
+		bool IsBranch { get; }
+
+		bool IsParallel { get; }
 
 		IExecutionNode Previous { get; }
 
