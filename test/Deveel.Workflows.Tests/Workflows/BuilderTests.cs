@@ -241,6 +241,36 @@ namespace Deveel.Workflows {
 			Assert.AreEqual("[begin]->seed->branch[b1[addTen,addTen]|b2[addTen,addTen]]->merge", final.PathString);
 		}
 
+		[Test]
+		public void BranchFactoryWithMerge() {
+			var builder = Workflow.Build(workflow => workflow
+				.Activity(activity => activity
+					.Named("seed")
+					.Execute(state => state.SetValue(11)))
+				.Branch(branch => branch
+					.Named("branch")
+					.InParallel()
+					.Branch(branch1 => branch1
+						.Named("b1")
+						.Activity<AddTenActivity>()
+						.Activity<AddTenActivity>())
+					.Branch(branch2 => branch2
+						.Named("b2")
+						.Activity<AddTenActivity>()
+						.Activity<AddTenActivity>())
+					.AsFactory(state => new[] {new State(state.Value), new State(state.Value)}))
+				.Merge("merge",
+					values => values.Cast<State[]>()
+						.Select(x => x.Sum(y => ((State[])y.Value).Sum(z => (int)z.Value))).Sum(x => x)));
+
+			var flow = builder.Build();
+			var final = flow.Execute();
+
+			Assert.IsNotNull(final);
+			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.AreEqual(124, final.Value);
+		}
+
 		#region AddTenActivity
 
 		class AddTenActivity : Activity<int, int> {

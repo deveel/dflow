@@ -10,6 +10,8 @@ namespace Deveel.Workflows {
 
 		IBranchBuilder Activity(Action<IActivityBuilder> activity);
 
+		void AsFactory(IStateFactory stateFactory);
+
 		IBranchActivity Build(IBuildContext context);
 	}
 }

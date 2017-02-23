@@ -26,46 +26,6 @@ namespace Deveel.Workflows {
 			activities.Add(activity);
 		}
 
-		public void Add(string name, Func<State, CancellationToken, Task<State>> execution) {
-			Add(name, state => true, execution);
-		}
-
-		public void Add(string name, Func<State, bool> decision, Func<State, CancellationToken, Task<State>> execution) {
-			Add(new Activity(name, decision, execution));
-		}
-
-		public void Add(string name, Func<State, bool> decision, Func<State, Task<State>> execution) {
-			Add(name, decision, (state, token) => execution(state));
-		}
-
-		public void Add(string name, Func<State, Task<State>> execution) {
-			Add(name, state => true, execution);
-		}
-
-		public void Add(string name, Func<State, State> execution) {
-			Add(name, state => true, execution);
-		}
-
-		public void Add(string name, Func<State, bool> decision, Func<State, State> execution) {
-			Add(name, decision, (state, token) => Task.FromResult(execution(state)));
-		}
-
-		public void Add(string name, IMergeStrategy strategy) {
-			Add(new MergeActivity(name, strategy));
-		}
-
-		public void Add(string name, IBranchStrategy strategy, params IActivity[] branched) {
-			Add(name, null, strategy, branched);
-		}
-
-		public void Add(string name, Func<State, bool> decision, IBranchStrategy strategy, params IActivity[] branched) {
-			Add(new BranchActivity(name, decision, strategy, branched));
-		}
-
-		public void Add(string name, IRepeatDecisor decisor) {
-			Add(new RepeatActivity(name, decisor));
-		}
-
 		public static IWorkflowBuilder Build(Action<IWorkflowBuilder> workflow) {
 			var builder = new WorkflowBuilder();
 			workflow(builder);

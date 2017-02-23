@@ -111,7 +111,7 @@ namespace Deveel.Workflows {
 			return New(new VirtualComponent(component));
 		}
 
-		public State NewBranch(IComponent component) {
+		public BranchState NewBranch(IComponent component) {
 			var state = new BranchState(this, component);
 			Next = state;
 			return state;

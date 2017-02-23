@@ -40,5 +40,9 @@ namespace Deveel.Workflows {
 		public static IBranchBuilder Repeat(this IBranchBuilder builder, string name, Func<State, bool> decisor) {
 			return builder.Activity(activity => activity.Repeat(name, RepeatDecision.New(decisor)));
 		}
+
+		public static void AsFactory(this IBranchBuilder builder, Func<State, IEnumerable<State>> stateFactory) {
+			builder.AsFactory(StateFactories.New(stateFactory));
+		}
 	}
 }
