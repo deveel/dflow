@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
 
 using Deveel.Workflows.Graph;
 
@@ -165,6 +167,38 @@ namespace Deveel.Workflows {
 
 		public void SetMetadata(string key, object value) {
 			Metadata[key] = value;
+		}
+
+		public object ValueAs(Type type) {
+			return ValueAs(type, CultureInfo.InvariantCulture);
+		}
+
+		public object ValueAs(Type type, IFormatProvider formatProvider) {
+			if (type == null)
+				throw new ArgumentNullException(nameof(type));
+			if (formatProvider == null)
+				throw new ArgumentNullException(nameof(formatProvider));
+
+			var value = Value;
+
+			if (!type.GetTypeInfo().IsInstanceOfType(value)) {
+				var nullableType = Nullable.GetUnderlyingType(type);
+				if (nullableType == null) {
+					value = Convert.ChangeType(value, type, formatProvider);
+				} else {
+					value = Convert.ChangeType(value, nullableType, formatProvider);
+				}
+			}
+
+			return value;
+		}
+
+		public T ValueAs<T>() {
+			return ValueAs<T>(CultureInfo.InvariantCulture);
+		}
+
+		public T ValueAs<T>(IFormatProvider formatProvider) {
+			return (T) ValueAs(typeof(T), formatProvider);
 		}
 
 		public ExecutionReport GetReport() {
