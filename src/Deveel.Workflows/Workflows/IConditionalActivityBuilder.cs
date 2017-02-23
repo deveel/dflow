@@ -6,6 +6,6 @@ namespace Deveel.Workflows {
 	public interface IConditionalActivityBuilder {
 		void Branch(Action<IBranchBuilder> branch);
 
-		void Execute(Func<State, CancellationToken, Task<State>> execution);
+		IActivityFactorableBuilder Execute(Func<State, CancellationToken, Task<State>> execution);
 	}
 }

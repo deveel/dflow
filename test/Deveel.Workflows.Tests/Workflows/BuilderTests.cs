@@ -271,6 +271,29 @@ namespace Deveel.Workflows {
 			Assert.AreEqual(124, final.Value);
 		}
 
+		[Test]
+		public void ActivityFactoryWithMerge() {
+			var builder = Workflow.Build(workflow => workflow
+				.Activity(activity => activity
+					.Named("seed")
+					.Execute(state => state.SetValue(11)))
+				.Activity(activity => activity
+					.Named("add")
+					.Execute(state => state.SetValue((int) state.Value + 1))
+					.AsFactory(state => new[] {
+						new State((int) state.Value + 2),
+						new State((int) state.Value + 2),
+					}))
+				.Merge("merge", values => values.Cast<int>().Sum(y => y)));
+
+			var flow = builder.Build();
+			var final = flow.Execute();
+
+			Assert.IsNotNull(final);
+			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.AreEqual(28, final.Value);
+		}
+
 		#region AddTenActivity
 
 		class AddTenActivity : Activity<int, int> {

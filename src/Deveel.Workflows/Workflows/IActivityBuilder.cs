@@ -5,9 +5,9 @@ namespace Deveel.Workflows {
 	public interface IActivityBuilder {
 		INamedActivityBuilder Named(string name);
 
-		void OfType(Type type);
+		IActivityFactorableBuilder OfType(Type type);
 
-		void Proxy(IActivity activity);
+		IActivityFactorableBuilder Proxy(IActivity activity);
 
 		void Branch(Action<IBranchBuilder> branch);
 

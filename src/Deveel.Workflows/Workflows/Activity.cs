@@ -19,11 +19,14 @@ namespace Deveel.Workflows {
 		}
 
 		public Activity(string name) 
-			: this(name, null) {
+			: this(name, (Func<State, CancellationToken, Task<State>>)null) {
 		}
 
 		public Activity(string name, Func<State, CancellationToken, Task<State>> execution) 
 			: this(name, null, execution) {
+		}
+
+		public Activity(string name, Func<State, bool> decision) : this(name, decision, null) {
 		}
 
 		public Activity(string name, Func<State, bool> decision, Func<State, CancellationToken, Task<State>> execution) {

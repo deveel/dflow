@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Deveel.Workflows.Graph;
 
 namespace Deveel.Workflows {
-	class ActivityBuilder : IActivityBuilder, INamedActivityBuilder, IConditionalActivityBuilder, IExecutionNodeBuilder {
+	class ActivityBuilder : IActivityBuilder, INamedActivityBuilder, 
+		IConditionalActivityBuilder, 
+		IExecutionNodeBuilder, IActivityFactorableBuilder {
 		private string Name { get; set; }
 
 		private Dictionary<string, object> Metadata { get; set; }
@@ -20,6 +22,10 @@ namespace Deveel.Workflows {
 		private IActivity ProxyActivity { get; set; }
 
 		private Func<State, CancellationToken, Task<State>> Execution { get; set; }
+
+		private bool Factory { get; set; }
+
+		private IStateFactory StateFactory { get; set; }
 
 		private bool OptionSet { get; set; }
 
@@ -64,7 +70,22 @@ namespace Deveel.Workflows {
 				}
 			}
 
+			if (Factory) {
+				if (StateFactory == null)
+					throw new InvalidOperationException();
+
+				activity = new ActivityFactoryActivity(Name, Decision, activity, StateFactory);
+			}
+
 			return activity;
+		}
+
+		public void AsFactory(IStateFactory stateFactory) {
+			if (stateFactory == null)
+				throw new ArgumentNullException(nameof(stateFactory));
+
+			Factory = true;
+			StateFactory = stateFactory;
 		}
 
 		public ExecutionNode BuildNode() {
@@ -101,29 +122,28 @@ namespace Deveel.Workflows {
 			OptionSet = true;
 		}
 
-		public void OfType(Type type) {
+		public IActivityFactorableBuilder OfType(Type type) {
 			AssertOptionNotSet();
 
 			ActivityType = type;
 			OptionSet = true;
+			return this;
 		}
 
-		public void Proxy(IActivity activity) {
+		public IActivityFactorableBuilder Proxy(IActivity activity) {
 			AssertOptionNotSet();
 
 			ProxyActivity = activity;
 			OptionSet = true;
+			return this;
 		}
 
-		public void Execute(Func<State, CancellationToken, Task<State>> execution) {
+		public IActivityFactorableBuilder Execute(Func<State, CancellationToken, Task<State>> execution) {
 			AssertOptionNotSet();
 
 			Execution = execution;
 			OptionSet = true;
-		}
-
-		public IExecutionNode BuildGraphNode() {
-			throw new NotImplementedException();
+			return this;
 		}
 	}
 }

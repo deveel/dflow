@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,7 +10,7 @@ namespace Deveel.Workflows {
 		}
 
 		public Activity(string name)
-			: base(name, null) {
+			: base(name, (Func<State, bool>) null) {
 		}
 
 		public Activity(string name, Func<State, CancellationToken, Task<State>> execution)

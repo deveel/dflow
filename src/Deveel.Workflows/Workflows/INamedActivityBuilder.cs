@@ -10,6 +10,9 @@ namespace Deveel.Workflows {
 
 		void Branch(Action<IBranchBuilder> branch);
 
-		void Execute(Func<State, CancellationToken, Task<State>> execution);
+		IActivityFactorableBuilder Execute(Func<State, CancellationToken, Task<State>> execution);
+
+
+		IActivity Build(IBuildContext context);
 	}
 }
