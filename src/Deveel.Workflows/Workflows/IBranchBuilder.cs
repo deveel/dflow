@@ -12,6 +12,8 @@ namespace Deveel.Workflows {
 
 		void AsFactory(IStateFactory stateFactory);
 
+		void AsFactory(Type factoryType);
+
 		IBranchActivity Build(IBuildContext context);
 	}
 }

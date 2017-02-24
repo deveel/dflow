@@ -45,5 +45,9 @@ namespace Deveel.Workflows {
 		public static void AsFactory(this IActivityFactorableBuilder builder, Func<State, IEnumerable<State>> factory) {
 			builder.AsFactory(StateFactories.New(factory));
 		}
+
+		public static void AsFactory<TFactory>(this IActivityFactorableBuilder builder) where TFactory : class, IStateFactory {
+			builder.AsFactory(typeof(TFactory));
+		}
 	}
 }

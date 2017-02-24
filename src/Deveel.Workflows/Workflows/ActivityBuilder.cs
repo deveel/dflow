@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,6 +27,8 @@ namespace Deveel.Workflows {
 		private bool Factory { get; set; }
 
 		private IStateFactory StateFactory { get; set; }
+
+		private Type StateFactoryType { get; set; }
 
 		private bool OptionSet { get; set; }
 
@@ -57,7 +60,7 @@ namespace Deveel.Workflows {
 				if (context == null)
 					throw new NotSupportedException("The builder references a type that cannot be resolved outside a context");
 
-				activity = context.ResolveActivity(ActivityType);
+				activity = context.Resolve(ActivityType) as IActivity;
 			} else if (ProxyActivity != null) {
 				activity = ProxyActivity;
 			} else if (BranchBuilder != null) {
@@ -71,10 +74,15 @@ namespace Deveel.Workflows {
 			}
 
 			if (Factory) {
-				if (StateFactory == null)
-					throw new InvalidOperationException();
+				if (StateFactory == null &&
+					StateFactoryType == null)
+					throw new InvalidOperationException("Invalid setup for a state factory");
 
-				activity = new ActivityFactoryActivity(Name, Decision, activity, StateFactory);
+				var factory = StateFactory;
+				if (factory == null && StateFactoryType != null)
+					factory = context.Resolve(StateFactoryType) as IStateFactory;
+
+				activity = new ActivityFactoryActivity(Name, Decision, activity, factory);
 			}
 
 			return activity;
@@ -86,6 +94,17 @@ namespace Deveel.Workflows {
 
 			Factory = true;
 			StateFactory = stateFactory;
+		}
+
+		public void AsFactory(Type factoryType) {
+			if (factoryType == null)
+				throw new ArgumentNullException(nameof(factoryType));
+
+			if (!typeof(IStateFactory).GetTypeInfo().IsAssignableFrom(factoryType))
+				throw new ArgumentException($"The type '{factoryType}' is not assignable from '{typeof(IStateFactory)}'.");
+
+			Factory = true;
+			StateFactoryType = factoryType;
 		}
 
 		public ExecutionNode BuildNode() {

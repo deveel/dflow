@@ -2,6 +2,6 @@
 
 namespace Deveel.Workflows {
 	public interface IBuildContext {
-		IActivity ResolveActivity(Type activityType);
+		object Resolve(Type activityType);
 	}
 }
