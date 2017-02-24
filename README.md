@@ -1,4 +1,4 @@
-[![Build status](https://ci.appveyor.com/api/projects/status/7rqkmoa5ij5hm2an?svg=true)](https://ci.appveyor.com/project/Deveel/dflow) [![MyGet Version](https://img.shields.io/myget/dflow/v/Deveel.Workflows.svg?label=DFlow+at+MyGet)](https://www.myget.org/feed/dflow/package/nuget/Deveel.Workflows) [![NuGet Version](https://img.shields.io/nuget/v/Deveel.Workflows.svg?label=DFlow+at+NuGet)](https://www.nuget.org/packages/Deveel.Workflows)
+[![Build status](https://ci.appveyor.com/api/projects/status/7rqkmoa5ij5hm2an?svg=true)](https://ci.appveyor.com/project/Deveel/dflow) [![MyGet](https://img.shields.io/myget/deveel/v/Deveel.Workflows.svg?label=MyGet)](https://www.myget.org/feed/deveel/package/nuget/Deveel.Workflows) [![NuGet](https://img.shields.io/nuget/v/Deveel.Workflows.svg?label=NuGet)](https://www.nuget.org/packages/Deveel.Workflows)
 
 # DFlow
 
