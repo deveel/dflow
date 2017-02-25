@@ -24,7 +24,7 @@ This is a lightweight library, with no aim to be an enterprise-level solution, t
 - **Nightly Builds**
 
     Add the following sources to NuGet
-    https://www.myget.org/F/dflow/api/v3/index.json | https://www.myget.org/F/dflow/api/v2
+    https://www.myget.org/F/deveel/api/v3/index.json | https://www.myget.org/F/deveel/api/v2
 
     In the Package Manager console type
 
