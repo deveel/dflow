@@ -2,25 +2,21 @@
 
 namespace Deveel.Workflows {
 	/// <summary>
-	/// Provides a context for the resolution of activities
+	/// Provides a context for the resolution of services
 	/// during the build process of a workflow
 	/// </summary>
 	public interface IBuildContext {
 		/// <summary>
-		/// Resolves the provided type to  an instance of
-		/// <see cref="IActivity"/>
+		/// Resolves the provided type to  an instance of an object
 		/// </summary>
-		/// <param name="activityType">The type to resolve.</param>
+		/// <param name="serviceType">The type to resolve.</param>
 		/// <returns>
-		/// Returns an instance of <see cref="IActivity"/> resolved
-		/// from the provided type.
+		/// Returns an instance of and object resolved from the provided type.
 		/// </returns>
-		/// <exception cref="ArgumentNullException">If the provided <paramref name="activityType"/>
+		/// <exception cref="ArgumentNullException">If the provided <paramref name="serviceType"/>
 		/// is <c>null</c></exception>
-		/// <exception cref="ArgumentException">If the provided <paramref name="activityType"/>
-		/// is not assignable from <see cref="IActivity"/>.</exception>
-		/// <exception cref="ActivityResolveException">If it was not possible to resolve
-		/// the activity because of an unknown error.</exception>
-		IActivity ResolveActivity(Type activityType);
+		/// <exception cref="ServiceResolutionException">If the given <paramref name="serviceType"/>
+		/// was not resolved in the current context because of an unknown error.</exception>
+		object Resolve(Type serviceType);
 	}
 }

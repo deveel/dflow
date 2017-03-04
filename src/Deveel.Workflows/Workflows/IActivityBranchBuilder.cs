@@ -83,6 +83,8 @@ namespace Deveel.Workflows {
 		/// is <c>null</c>.</exception>
 		void AsFactory(IStateFactory stateFactory);
 
+		void AsFactory(Type factoryType);
+
 		/// <summary>
 		/// Builds an instance of <see cref="IBranchActivity"/> using the
 		/// configured properties in this builder, against a provided

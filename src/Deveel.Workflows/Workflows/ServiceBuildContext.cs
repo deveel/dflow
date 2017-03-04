@@ -8,15 +8,14 @@ namespace Deveel.Workflows {
 			this.serviceProvider = serviceProvider;
 		}
 
-		public IActivity ResolveActivity(Type activityType) {
-			try {
-				var activity = serviceProvider.GetService(activityType) as IActivity;
-				if (activity == null)
-					throw new ActivityResolveException(activityType);
+		public object Resolve(Type serviceType) {
+			if (serviceType == null)
+				throw new ArgumentNullException(nameof(serviceType));
 
-				return activity;
+			try {
+				return serviceProvider.GetService(serviceType) as IActivity;
 			} catch (Exception ex) {
-				throw new ActivityResolveException(activityType, $"Could not resolve type '{activityType}' because of an error", ex);
+				throw new ServiceResolutionException(serviceType, $"Could not resolve type '{serviceType}' because of an error", ex);
 			}
 		}
 	}

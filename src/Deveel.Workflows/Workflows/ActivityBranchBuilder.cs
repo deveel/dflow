@@ -28,7 +28,7 @@ namespace Deveel.Workflows {
 
 		private Type StateFactoryType { get; set; }
 
-		public IBranchBuilder Named(string name) {
+		public IActivityBranchBuilder Named(string name) {
 			Name = name;
 			return this;
 		}
