@@ -4,8 +4,8 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows {
 	public static class ActivityBuilderExtensions {
-		public static void OfType<TActivity>(this IActivityBuilder builder) where TActivity : class, IActivity {
-			builder.OfType(typeof(TActivity));
+		public static IActivityFactorableBuilder OfType<TActivity>(this IActivityBuilder builder) where TActivity : class, IActivity {
+			return builder.OfType(typeof(TActivity));
 		}
 
 		public static IActivityFactorableBuilder Merge(this IActivityBuilder builder, string name, IMergeStrategy strategy) {
@@ -44,6 +44,10 @@ namespace Deveel.Workflows {
 
 		public static void AsFactory(this IActivityFactorableBuilder builder, Func<State, IEnumerable<State>> factory) {
 			builder.AsFactory(StateFactories.New(factory));
+		}
+
+		public static void AsFactory<TFactory>(this IActivityFactorableBuilder builder) where TFactory : class, IStateFactory {
+			builder.AsFactory(typeof(TFactory));
 		}
 	}
 }

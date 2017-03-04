@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 using Deveel.Workflows.Graph;
 
@@ -25,7 +26,9 @@ namespace Deveel.Workflows {
 
 		private IStateFactory StateFactory { get; set; }
 
-		public IActivityBranchBuilder Named(string name) {
+		private Type StateFactoryType { get; set; }
+
+		public IBranchBuilder Named(string name) {
 			Name = name;
 			return this;
 		}
@@ -65,7 +68,19 @@ namespace Deveel.Workflows {
 				throw new InvalidOperationException();
 
 			if (Factory) {
-				return new BranchFactoryActivity(Name, Decision, activities, StateFactory);
+				if (StateFactory == null &&
+					StateFactoryType == null)
+					throw new InvalidOperationException();
+
+				var stateFactory = StateFactory;
+
+				if (stateFactory == null && context == null)
+					throw new NotSupportedException();
+
+				if (stateFactory == null)
+					stateFactory = context.Resolve(StateFactoryType) as IStateFactory;
+
+				return new BranchFactoryActivity(Name, Decision, activities, stateFactory);
 			}
 
 
@@ -87,6 +102,17 @@ namespace Deveel.Workflows {
 
 			Factory = true;
 			StateFactory = stateFactory;
+		}
+
+		public void AsFactory(Type factoryType) {
+			if (factoryType == null)
+				throw new ArgumentNullException(nameof(factoryType));
+
+			if (!typeof(IStateFactory).GetTypeInfo().IsAssignableFrom(factoryType))
+				throw new ArgumentException($"The type {factoryType} is not assignable from {typeof(IStateFactory)}");
+
+			StateFactoryType = factoryType;
+			Factory = true;
 		}
 	}
 }
