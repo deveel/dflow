@@ -3,45 +3,45 @@ using System.Collections.Generic;
 
 namespace Deveel.Workflows {
 	public static class BranchBuilderExtensions {
-		public static IBranchBuilder InParallel(this IBranchBuilder builder) {
+		public static IActivityBranchBuilder InParallel(this IActivityBranchBuilder builder) {
 			return builder.With(BranchStrategies.Parallel);
 		}
 
-		public static IBranchBuilder InSequence(this IBranchBuilder builder) {
+		public static IActivityBranchBuilder InSequence(this IActivityBranchBuilder builder) {
 			return builder.With(BranchStrategies.Sequential);
 		}
 
-		public static IBranchBuilder Activity<TActivity>(this IBranchBuilder builder)
+		public static IActivityBranchBuilder Activity<TActivity>(this IActivityBranchBuilder builder)
 			where TActivity : class, IActivity {
 			return builder.Activity(activity => activity.OfType(typeof(TActivity)));
 		}
 
-		public static IBranchBuilder Activity<TActivity>(this IBranchBuilder builder, TActivity activity)
+		public static IActivityBranchBuilder Activity<TActivity>(this IActivityBranchBuilder builder, TActivity activity)
 			where TActivity : class, IActivity {
 			return builder.Activity(x => x.Proxy(activity));
 		}
 
-		public static IBranchBuilder Branch(this IBranchBuilder builder, Action<IBranchBuilder> branch) {
+		public static IActivityBranchBuilder Branch(this IActivityBranchBuilder builder, Action<IActivityBranchBuilder> branch) {
 			return builder.Activity(activity => activity.Branch(branch));
 		}
 
-		public static IBranchBuilder Merge(this IBranchBuilder builder, string name, IMergeStrategy strategy) {
+		public static IActivityBranchBuilder Merge(this IActivityBranchBuilder builder, string name, IMergeStrategy strategy) {
 			return builder.Activity(activity => activity.Merge(name, strategy));
 		}
 
-		public static IBranchBuilder Merge(this IBranchBuilder builder, string name, Func<IEnumerable<object>, object> merge) {
+		public static IActivityBranchBuilder Merge(this IActivityBranchBuilder builder, string name, Func<IEnumerable<object>, object> merge) {
 			return builder.Merge(name, MergeStrategies.New(merge));
 		}
 
-		public static IBranchBuilder Repeat(this IBranchBuilder builder, string name, IRepeatDecisor decisor) {
+		public static IActivityBranchBuilder Repeat(this IActivityBranchBuilder builder, string name, IRepeatDecisor decisor) {
 			return builder.Activity(activity => activity.Repeat(name, decisor));
 		}
 
-		public static IBranchBuilder Repeat(this IBranchBuilder builder, string name, Func<State, bool> decisor) {
+		public static IActivityBranchBuilder Repeat(this IActivityBranchBuilder builder, string name, Func<State, bool> decisor) {
 			return builder.Activity(activity => activity.Repeat(name, RepeatDecision.New(decisor)));
 		}
 
-		public static void AsFactory(this IBranchBuilder builder, Func<State, IEnumerable<State>> stateFactory) {
+		public static void AsFactory(this IActivityBranchBuilder builder, Func<State, IEnumerable<State>> stateFactory) {
 			builder.AsFactory(StateFactories.New(stateFactory));
 		}
 	}

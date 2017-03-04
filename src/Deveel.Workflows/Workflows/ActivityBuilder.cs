@@ -17,7 +17,7 @@ namespace Deveel.Workflows {
 
 		private Type ActivityType { get; set; }
 
-		private BranchBuilder BranchBuilder { get; set; }
+		private ActivityBranchBuilder ActivityBranchBuilder { get; set; }
 
 		private IActivity ProxyActivity { get; set; }
 
@@ -49,35 +49,41 @@ namespace Deveel.Workflows {
 
 		public IActivity Build(IBuildContext context) {
 			if (!OptionSet)
-				throw new InvalidOperationException();
+				throw new ActivityBuildException("No valid option was set for the build of an activity");
 
-			IActivity activity;
+			try {
+				IActivity activity;
 
-			if (ActivityType != null) {
-				if (context == null)
-					throw new NotSupportedException("The builder references a type that cannot be resolved outside a context");
+				if (ActivityType != null) {
+					if (context == null)
+						throw new ActivityResolveException(ActivityType, "The builder references a type that cannot be resolved outside a context");
 
-				activity = context.ResolveActivity(ActivityType);
-			} else if (ProxyActivity != null) {
-				activity = ProxyActivity;
-			} else if (BranchBuilder != null) {
-				activity = BranchBuilder.Build(context);
-			} else {
-				activity = new Activity(Name, Decision, Execution);
+					activity = context.ResolveActivity(ActivityType);
+				} else if (ProxyActivity != null) {
+					activity = ProxyActivity;
+				} else if (ActivityBranchBuilder != null) {
+					activity = ActivityBranchBuilder.Build(context);
+				} else {
+					activity = new Activity(Name, Decision, Execution);
 
-				if (Metadata != null) {
-					((Activity)activity).SetMetadata(Metadata);
+					if (Metadata != null) {
+						((Activity)activity).SetMetadata(Metadata);
+					}
 				}
+
+				if (Factory) {
+					if (StateFactory == null)
+						throw new ActivityBuildException("The activity is indicated to be a factory but no state factory was specified.");
+
+					activity = new ActivityFactoryActivity(Name, Decision, activity, StateFactory);
+				}
+
+				return activity;
+			} catch (ActivityBuildException) {
+				throw;
+			} catch (Exception ex) {
+				throw new ActivityBuildException("Could not build the activity because of an error: see inner exception for details.", ex);
 			}
-
-			if (Factory) {
-				if (StateFactory == null)
-					throw new InvalidOperationException();
-
-				activity = new ActivityFactoryActivity(Name, Decision, activity, StateFactory);
-			}
-
-			return activity;
 		}
 
 		public void AsFactory(IStateFactory stateFactory) {
@@ -95,11 +101,11 @@ namespace Deveel.Workflows {
 			ExecutionNode node;
 
 			if (ActivityType != null) {
-				throw new NotImplementedException();
+				throw new NotImplementedException("Projection in the graph of a reference type not supported");
 			} else if (ProxyActivity != null) {
 				node = new ComponentNode(ProxyActivity);
-			} else if (BranchBuilder != null) {
-				node = BranchBuilder.BuildNode();
+			} else if (ActivityBranchBuilder != null) {
+				node = ActivityBranchBuilder.BuildNode();
 			} else {
 				node = new BuilderNode(Name, Decision != null, false, false, Metadata);
 			}
@@ -112,13 +118,13 @@ namespace Deveel.Workflows {
 			return this;
 		}
 
-		public void Branch(Action<IBranchBuilder> branch) {
+		public void Branch(Action<IActivityBranchBuilder> branch) {
 			AssertOptionNotSet();
 
-			var builder = new BranchBuilder();
+			var builder = new ActivityBranchBuilder();
 			branch(builder);
 
-			BranchBuilder = builder;
+			ActivityBranchBuilder = builder;
 			OptionSet = true;
 		}
 

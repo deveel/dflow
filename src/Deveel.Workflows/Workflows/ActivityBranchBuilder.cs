@@ -5,8 +5,8 @@ using System.Linq;
 using Deveel.Workflows.Graph;
 
 namespace Deveel.Workflows {
-	class BranchBuilder : IBranchBuilder, IExecutionNodeBuilder {
-		public BranchBuilder() {
+	class ActivityBranchBuilder : IActivityBranchBuilder, IExecutionNodeBuilder {
+		public ActivityBranchBuilder() {
 			Activities = new List<ActivityBuilder>();
 			Strategy = BranchStrategies.Sequential;
 		}
@@ -25,12 +25,12 @@ namespace Deveel.Workflows {
 
 		private IStateFactory StateFactory { get; set; }
 
-		public IBranchBuilder Named(string name) {
+		public IActivityBranchBuilder Named(string name) {
 			Name = name;
 			return this;
 		}
 
-		public IBranchBuilder With(IBranchStrategy strategy) {
+		public IActivityBranchBuilder With(IBranchStrategy strategy) {
 			if (strategy == null)
 				throw new ArgumentNullException(nameof(strategy));
 
@@ -38,7 +38,7 @@ namespace Deveel.Workflows {
 			return this;
 		}
 
-		public IBranchBuilder Activity(Action<IActivityBuilder> activity) {
+		public IActivityBranchBuilder Activity(Action<IActivityBuilder> activity) {
 			var builder = new ActivityBuilder();
 			activity(builder);
 
@@ -46,7 +46,7 @@ namespace Deveel.Workflows {
 			return this;
 		}
 
-		public IBranchBuilder If(Func<State, bool> decision) {
+		public IActivityBranchBuilder If(Func<State, bool> decision) {
 			Decision = decision;
 
 			return this;

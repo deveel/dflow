@@ -20,7 +20,7 @@ namespace Deveel.Workflows {
 
 			State current = state;
 			while (current != null) {
-				branch = current.StateInfo.Component as IBranch;
+				branch = current.ExecutionInfo.Component as IBranch;
 				if (branch != null)
 					break;
 

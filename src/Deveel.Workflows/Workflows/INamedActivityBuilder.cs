@@ -8,7 +8,7 @@ namespace Deveel.Workflows {
 
 		INamedActivityBuilder With(string key, object metadata);
 
-		void Branch(Action<IBranchBuilder> branch);
+		void Branch(Action<IActivityBranchBuilder> branch);
 
 		IActivityFactorableBuilder Execute(Func<State, CancellationToken, Task<State>> execution);
 

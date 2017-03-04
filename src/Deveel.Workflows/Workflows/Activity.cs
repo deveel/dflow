@@ -143,7 +143,7 @@ namespace Deveel.Workflows {
 			State result = next;
 
 			try {
-				next.StateInfo.Begin();
+				next.ExecutionInfo.Begin();
 
 				if (CanExecute(state)) {
 					executed = true;
@@ -152,14 +152,16 @@ namespace Deveel.Workflows {
 
 					if (errorList.Count > 0) {
 						foreach (var error in errorList) {
-							next.StateInfo.AddError(error);
+							next.ExecutionInfo.AddError(error);
 						}
 					}
 				}
+			}catch(ActivityExecutionException) {
+				throw;
 			} catch (Exception ex) {
-				next.StateInfo.AddFatalError(new ExecuteError(ex));
+				next.ExecutionInfo.AddFatalError(new ExecuteError(ex));
 			} finally {
-				next.StateInfo.End(executed);
+				next.ExecutionInfo.End(executed);
 			}
 
 			return result;

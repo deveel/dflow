@@ -22,14 +22,20 @@ namespace Deveel.Workflows {
 		}
 
 		public IWorkflow Build(IBuildContext context) {
-			var activities = builders.Select(x => x.Build(context));
+			try {
+				var activities = builders.Select(x => x.Build(context));
 
-			var workflow = new Workflow();
-			foreach (var activity in activities) {
-				workflow.Add(activity);
+				var workflow = new Workflow();
+				foreach (var activity in activities) {
+					workflow.Add(activity);
+				}
+
+				return workflow;
+			} catch (WorkflowBuildException) {
+				throw;
+			} catch (Exception ex) {
+				throw new WorkflowBuildException("Could not build the workflow because of an error: see inner exception for details", ex);
 			}
-
-			return workflow;
 		}
 
 		public ExecutionNode BuildNode() {

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows {
 	public interface IConditionalActivityBuilder {
-		void Branch(Action<IBranchBuilder> branch);
+		void Branch(Action<IActivityBranchBuilder> branch);
 
 		IActivityFactorableBuilder Execute(Func<State, CancellationToken, Task<State>> execution);
 	}

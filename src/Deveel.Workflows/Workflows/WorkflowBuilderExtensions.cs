@@ -13,7 +13,7 @@ namespace Deveel.Workflows {
 			return builder.Activity(x => x.Proxy(activity));
 		}
 
-		public static IWorkflowBuilder Branch(this IWorkflowBuilder builder, Action<IBranchBuilder> branch) {
+		public static IWorkflowBuilder Branch(this IWorkflowBuilder builder, Action<IActivityBranchBuilder> branch) {
 			return builder.Activity(activity => activity.Branch(branch));
 		}
 
@@ -36,5 +36,8 @@ namespace Deveel.Workflows {
 		public static IWorkflow Build(this IWorkflowBuilder builder) {
 			return builder.Build(new DefaultBuildContext());
 		}
+
+		public static IWorkflow Build(this IWorkflowBuilder builder, IServiceProvider serviceProvider)
+			=> builder.Build(new ServiceBuildContext(serviceProvider));
 	}
 }

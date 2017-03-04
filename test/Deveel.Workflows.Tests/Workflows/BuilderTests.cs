@@ -80,7 +80,7 @@ namespace Deveel.Workflows {
 			Assert.IsInstanceOf<string>(final.Value);
 			Assert.AreEqual("Hello World!", final.Value);
 			Assert.AreEqual("[begin]->hello->world->world2", final.PathString);
-			Assert.IsFalse(final.StateInfo.Executed);
+			Assert.IsFalse(final.ExecutionInfo.Executed);
 		}
 
 		[Test]
@@ -208,7 +208,7 @@ namespace Deveel.Workflows {
 			var final = flow.Execute(new State(23));
 
 			Assert.IsNotNull(final);
-			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.IsFalse(final.ExecutionInfo.Failed);
 			Assert.AreEqual(43, final.Value);
 			Assert.AreEqual("[begin]->addTen->addTen", final.PathString);
 		}
@@ -236,7 +236,7 @@ namespace Deveel.Workflows {
 			var final = flow.Execute();
 
 			Assert.IsNotNull(final);
-			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.IsFalse(final.ExecutionInfo.Failed);
 			Assert.AreEqual(62, final.Value);
 			Assert.AreEqual("[begin]->seed->branch[b1[addTen,addTen]|b2[addTen,addTen]]->merge", final.PathString);
 		}
@@ -267,7 +267,7 @@ namespace Deveel.Workflows {
 			var final = flow.Execute();
 
 			Assert.IsNotNull(final);
-			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.IsFalse(final.ExecutionInfo.Failed);
 			Assert.AreEqual(124, final.Value);
 		}
 
@@ -290,7 +290,7 @@ namespace Deveel.Workflows {
 			var final = flow.Execute();
 
 			Assert.IsNotNull(final);
-			Assert.IsFalse(final.StateInfo.Failed);
+			Assert.IsFalse(final.ExecutionInfo.Failed);
 			Assert.AreEqual(28, final.Value);
 		}
 

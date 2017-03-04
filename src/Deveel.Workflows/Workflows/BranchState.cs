@@ -12,7 +12,7 @@ namespace Deveel.Workflows {
 
 		public IEnumerable<State> States => (IEnumerable<State>) base.Value;
 
-		public bool IsParallel => ((IBranch) StateInfo.Component).Strategy.IsParallel;
+		public bool IsParallel => ((IBranch) ExecutionInfo.Component).Strategy.IsParallel;
 
 		public object Merge(IMergeStrategy strategy) {
 			return strategy.Merge(Value);

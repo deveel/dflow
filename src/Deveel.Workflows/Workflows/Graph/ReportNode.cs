@@ -10,7 +10,7 @@ namespace Deveel.Workflows.Graph {
 			this.state = state;
 		}
 
-		public string ComponentName => state.StateInfo.Component.Name;
+		public string ComponentName => state.ExecutionInfo.Component.Name;
 
 		public string ExecutionPath => state.PathString;
 
@@ -20,17 +20,17 @@ namespace Deveel.Workflows.Graph {
 
 		public bool ChangedValue => state.HasNewValue;
 
-		public DateTimeOffset StartedAt => state.StateInfo.StartedAt;
+		public DateTimeOffset StartedAt => state.ExecutionInfo.StartedAt;
 
-		public DateTimeOffset EndedAt => state.StateInfo.EndedAt.Value;
+		public DateTimeOffset EndedAt => state.ExecutionInfo.EndedAt.Value;
 
-		public TimeSpan Elapsed => state.StateInfo.Elapsed;
+		public TimeSpan Elapsed => state.ExecutionInfo.Elapsed;
 
-		public bool Executed => state.StateInfo.Executed;
+		public bool Executed => state.ExecutionInfo.Executed;
 
-		public bool Failed => state.StateInfo.Failed;
+		public bool Failed => state.ExecutionInfo.Failed;
 
-		public IEnumerable<ExecuteError> Errors => state.StateInfo.Errors;
+		public IEnumerable<ExecuteError> Errors => state.ExecutionInfo.Errors;
 
 		public bool Branch => state.IsBranch;
 
