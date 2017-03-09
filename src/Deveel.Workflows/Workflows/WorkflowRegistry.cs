@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Deveel.Workflows {
-	public class WorkflowRegistry : IDisposable {
+	public class WorkflowRegistry : IWorkflowRegistry, IDisposable {
 		private bool initialied;
 		private bool disposed;
 		private Dictionary<string, IWorkflowBuilder> builders;
@@ -14,7 +13,7 @@ namespace Deveel.Workflows {
 		}
 
 		public WorkflowRegistry(IWorkflowSelector selector) 
-			: this(null, selector) {
+			: this(new DefaultBuildContext(), selector) {
 		}
 
 		public WorkflowRegistry(IBuildContext context, IWorkflowSelector selector) {
@@ -28,7 +27,15 @@ namespace Deveel.Workflows {
 		}
 
 		public WorkflowRegistry()
-			: this(null, null) {
+			: this(new DefaultBuildContext(), null) {
+		}
+
+		public WorkflowRegistry(IServiceProvider serviceProvider)
+			: this(serviceProvider, null) {
+		}
+
+		public WorkflowRegistry(IServiceProvider serviceProvider, IWorkflowSelector selector)
+			: this(new ServiceBuildContext(serviceProvider), selector) {
 		}
 
 		~WorkflowRegistry() {
