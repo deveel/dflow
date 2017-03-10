@@ -61,7 +61,7 @@ namespace Deveel.Workflows {
 					if (context == null)
 						throw new ActivityResolveException(ActivityType, "The builder references a type that cannot be resolved outside a context");
 
-					activity = context.Resolve(ActivityType) as IActivity;
+					activity = (IActivity) context.Resolve(ActivityType);
 
 					if (activity == null)
 						throw new ActivityResolveException(ActivityType, $"The type '{ActivityType}' is not a valid instance of {typeof(IActivity)}");

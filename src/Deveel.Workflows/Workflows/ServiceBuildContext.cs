@@ -13,7 +13,7 @@ namespace Deveel.Workflows {
 				throw new ArgumentNullException(nameof(serviceType));
 
 			try {
-				return serviceProvider.GetService(serviceType) as IActivity;
+				return serviceProvider.GetService(serviceType);
 			} catch (Exception ex) {
 				throw new ServiceResolutionException(serviceType, $"Could not resolve type '{serviceType}' because of an error", ex);
 			}
