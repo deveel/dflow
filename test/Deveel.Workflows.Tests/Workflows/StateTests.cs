@@ -1,11 +1,10 @@
 ﻿using System;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace Deveel.Workflows {
-	[TestFixture]
 	public class StateTests {
-		[Test]
+		[Fact]
 		public void TransportMeta() {
 			var state = new State(89);
 			state = state.New("first");
@@ -13,10 +12,10 @@ namespace Deveel.Workflows {
 			state = state.New("second");
 
 			var meta = state.GetMetadata<int>("key1");
-			Assert.AreEqual(55, meta);
+			Assert.Equal(55, meta);
 		}
 
-		[Test]
+		[Fact]
 		public void OverrideMeta() {
 			var state = new State(89);
 			state = state.New("first");
@@ -26,32 +25,32 @@ namespace Deveel.Workflows {
 			state = state.New("third");
 
 			var meta = state.GetMetadata<string>("key1");
-			Assert.AreEqual("overridden", meta);
+			Assert.Equal("overridden", meta);
 		}
 
-		[Test]
+		[Fact]
 		public void TransportValue() {
 			var state = new State("foo");
 			state = state.New("first");
 			state = state.New("second");
 
-			Assert.IsNotNull(state.Value);
-			Assert.IsFalse(state.HasNewValue);
-			Assert.AreEqual("foo", state.Value);
+			Assert.NotNull(state.Value);
+			Assert.False(state.HasNewValue);
+			Assert.Equal("foo", state.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void TransportNewValue() {
 			var state = new State();
 			state = state.New("first").SetValue("foo");
 
-			Assert.IsTrue(state.HasNewValue);
+			Assert.True(state.HasNewValue);
 
 			state = state.New("second");
 
-			Assert.IsNotNull(state.Value);
-			Assert.IsFalse(state.HasNewValue);
-			Assert.AreEqual("foo", state.Value);
+			Assert.NotNull(state.Value);
+			Assert.False(state.HasNewValue);
+			Assert.Equal("foo", state.Value);
 		}
 	}
 }

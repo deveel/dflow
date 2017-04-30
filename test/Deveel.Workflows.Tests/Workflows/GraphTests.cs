@@ -4,12 +4,11 @@ using System.Linq;
 
 using Deveel.Workflows.Graph;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace Deveel.Workflows {
-	[TestFixture]
 	public class GraphTests {
-		[Test]
+		[Fact]
 		public void SimpleSequentialGraph() {
 			var workflow = Workflow.Build(builder => builder
 				.Activity(x => x
@@ -22,19 +21,19 @@ namespace Deveel.Workflows {
 			var flow = workflow.Build();
 
 			var graph = flow.Graph();
-			Assert.IsNotNull(graph.Nodes);
+			Assert.NotNull(graph.Nodes);
 
 			var nodes = graph.Nodes.ToList();
-			Assert.AreEqual(2, nodes.Count);
-			Assert.IsNull(nodes[0].Previous);
-			Assert.IsNotNull(nodes[0].Next);
-			Assert.AreEqual("a", nodes[0].Name);
-			Assert.IsNotNull(nodes[1]);
-			Assert.IsNotNull(nodes[1].Previous);
-			Assert.IsNull(nodes[1].Next);
+			Assert.Equal(2, nodes.Count);
+			Assert.Null(nodes[0].Previous);
+			Assert.NotNull(nodes[0].Next);
+			Assert.Equal("a", nodes[0].Name);
+			Assert.NotNull(nodes[1]);
+			Assert.NotNull(nodes[1].Previous);
+			Assert.Null(nodes[1].Next);
 		}
 
-		[Test]
+		[Fact]
 		public void NodeWithDecision() {
 			var workflow = Workflow.Build(builder => builder
 				.Activity(x => x
@@ -50,10 +49,10 @@ namespace Deveel.Workflows {
 			var graph = flow.Graph();
 			var nodes = graph.Nodes.ToList();
 
-			Assert.IsTrue(nodes[1].HasDecision);
+			Assert.True(nodes[1].HasDecision);
 		}
 
-		[Test]
+		[Fact]
 		public void BranchNode() {
 			var workflow = Workflow.Build(builder => builder
 				.Activity(x => x
@@ -73,12 +72,12 @@ namespace Deveel.Workflows {
 			var graph = flow.Graph();
 			var nodes = graph.Nodes.ToList();
 
-			Assert.AreEqual(3, nodes.Count);
-			Assert.IsNotEmpty(nodes[2].Nodes);
-			Assert.IsNotNull(nodes[2].Nodes.First());
+			Assert.Equal(3, nodes.Count);
+			Assert.NotEmpty(nodes[2].Nodes);
+			Assert.NotNull(nodes[2].Nodes.First());
 		}
 
-		[Test]
+		[Fact]
 		public void ProjectBuilder() {
 			var workflow = Workflow.Build(builder => builder
 				.Activity(x => x
@@ -95,18 +94,18 @@ namespace Deveel.Workflows {
 
 			var graph = workflow.Graph();
 
-			Assert.IsNotNull(graph);
-			Assert.IsNotEmpty(graph.Nodes);
+			Assert.NotNull(graph);
+			Assert.NotEmpty(graph.Nodes);
 
 			var nodes = graph.Nodes.ToList();
 
-			Assert.AreEqual(3, nodes.Count);
-			Assert.IsNotNull(nodes[0]);
-			Assert.IsNotNull(nodes[2]);
-			Assert.IsNotEmpty(nodes[2].Nodes);
+			Assert.Equal(3, nodes.Count);
+			Assert.NotNull(nodes[0]);
+			Assert.NotNull(nodes[2]);
+			Assert.NotEmpty(nodes[2].Nodes);
 		}
 
-		[Test]
+		[Fact]
 		public void InspectMeta() {
 			var workflow = Workflow.Build(builder => builder
 				.Activity(x => x

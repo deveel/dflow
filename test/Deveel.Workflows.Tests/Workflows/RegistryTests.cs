@@ -2,12 +2,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace Deveel.Workflows {
-	[TestFixture]
 	public class RegistryTests {
-		[Test]
+		[Fact]
 		public void CreateRegistry() {
 			var registry = new WorkflowRegistry(new DefaultBuildContext());
 			registry.Register("a", builder => builder
@@ -16,7 +15,7 @@ namespace Deveel.Workflows {
 
 			var workflow = registry.GetWorkflow("a");
 
-			Assert.IsNotNull(workflow);
+			Assert.NotNull(workflow);
 		}
 
 		#region AddOneActivity

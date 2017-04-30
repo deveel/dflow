@@ -4,12 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace Deveel.Workflows {
-	[TestFixture]
 	public class BuilderTests {
-		[Test]
+		[Fact]
 		public async Task BuildSimpleEchoWorkflowAndExecute() {
 			string echo = null;
 
@@ -20,17 +19,17 @@ namespace Deveel.Workflows {
 
 			var flow = builder.Build();
 
-			Assert.IsNotNull(flow);
-			Assert.AreEqual(1, flow.Activities.Count());
+			Assert.NotNull(flow);
+			Assert.Equal(1, flow.Activities.Count());
 
 			var result = await flow.ExecuteAsync();
 
-			Assert.IsNotNull(result);
-			Assert.IsNotNull(result.Value);
-			Assert.AreEqual(echo, result.Value);
+			Assert.NotNull(result);
+			Assert.NotNull(result.Value);
+			Assert.Equal(echo, result.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void SimpleTransform() {
 			var builder = Workflow.Build(worflow => worflow
 				.Activity(activity => activity
@@ -43,18 +42,18 @@ namespace Deveel.Workflows {
 
 			var flow = builder.Build();
 
-			Assert.IsNotNull(flow);
-			Assert.AreEqual(2, flow.Activities.Count());
+			Assert.NotNull(flow);
+			Assert.Equal(2, flow.Activities.Count());
 
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsInstanceOf<string>(final.Value);
-			Assert.AreEqual("Hello World!", final.Value);
-			Assert.AreEqual("[begin]->hello->world", final.PathString);
+			Assert.NotNull(final);
+			Assert.IsType<string>(final.Value);
+			Assert.Equal("Hello World!", final.Value);
+			Assert.Equal("[begin]->hello->world", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void ConditionalTransform() {
 			var builder = Workflow.Build(worflow => worflow
 				.Activity(activity => activity
@@ -71,19 +70,19 @@ namespace Deveel.Workflows {
 
 			var flow = builder.Build();
 
-			Assert.IsNotNull(flow);
-			Assert.AreEqual(3, flow.Activities.Count());
+			Assert.NotNull(flow);
+			Assert.Equal(3, flow.Activities.Count());
 
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsInstanceOf<string>(final.Value);
-			Assert.AreEqual("Hello World!", final.Value);
-			Assert.AreEqual("[begin]->hello->world->world2", final.PathString);
-			Assert.IsFalse(final.ExecutionInfo.Executed);
+			Assert.NotNull(final);
+			Assert.IsType<string>(final.Value);
+			Assert.Equal("Hello World!", final.Value);
+			Assert.Equal("[begin]->hello->world->world2", final.PathString);
+			Assert.False(final.ExecutionInfo.Executed);
 		}
 
-		[Test]
+		[Fact]
 		public void SequentialBranch() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -104,14 +103,14 @@ namespace Deveel.Workflows {
 
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsNotNull(final.Value);
-			Assert.IsInstanceOf<int>(final.Value);
-			Assert.AreEqual(28, final.Value);
-			Assert.AreEqual("[begin]->seed->sbranch[addOne,addFive]->merge", final.PathString);
+			Assert.NotNull(final);
+			Assert.NotNull(final.Value);
+			Assert.IsType<int>(final.Value);
+			Assert.Equal(28, final.Value);
+			Assert.Equal("[begin]->seed->sbranch[addOne,addFive]->merge", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void UnmergedParallelBranch() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -131,19 +130,19 @@ namespace Deveel.Workflows {
 
 			var final = flow.Execute();
 
-			Assert.IsInstanceOf<BranchState>(final);
-			Assert.IsNotNull(final);
-			Assert.IsNotNull(final.Value);
-			Assert.IsTrue(final.IsBranch);
+			Assert.IsType<BranchState>(final);
+			Assert.NotNull(final);
+			Assert.NotNull(final.Value);
+			Assert.True(final.IsBranch);
 
-			Assert.IsInstanceOf<IEnumerable<State>>(final.Value);
-			Assert.AreEqual(2, final.AsBranch().Value.Length);
-			Assert.AreEqual(23, final.AsBranch().Value[0]);
-			Assert.AreEqual(27, final.AsBranch().Value[1]);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]", final.PathString);
+			Assert.IsAssignableFrom<IEnumerable<State>>(final.Value);
+			Assert.Equal(2, final.AsBranch().Value.Length);
+			Assert.Equal(23, final.AsBranch().Value[0]);
+			Assert.Equal(27, final.AsBranch().Value[1]);
+			Assert.Equal("[begin]->seed->pbranch[addOne|addFive]", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void MergedParallelBranch() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -164,14 +163,14 @@ namespace Deveel.Workflows {
 
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsNotNull(final.Value);
-			Assert.IsInstanceOf<int>(final.Value);
-			Assert.AreEqual(50, final.Value);
-			Assert.AreEqual("[begin]->seed->pbranch[addOne|addFive]->merge", final.PathString);
+			Assert.NotNull(final);
+			Assert.NotNull(final.Value);
+			Assert.IsType<int>(final.Value);
+			Assert.Equal(50, final.Value);
+			Assert.Equal("[begin]->seed->pbranch[addOne|addFive]->merge", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void RepeatBranch() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -192,13 +191,13 @@ namespace Deveel.Workflows {
 
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsNotNull(final.Value);
-			Assert.IsInstanceOf<int>(final.Value);
-			Assert.AreEqual(100, final.Value);
+			Assert.NotNull(final);
+			Assert.NotNull(final.Value);
+			Assert.IsType<int>(final.Value);
+			Assert.Equal(100, final.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void UseTypedActivity() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity<AddTenActivity>()
@@ -207,13 +206,13 @@ namespace Deveel.Workflows {
 			var flow = builder.Build();
 			var final = flow.Execute(new State(23));
 
-			Assert.IsNotNull(final);
-			Assert.IsFalse(final.ExecutionInfo.Failed);
-			Assert.AreEqual(43, final.Value);
-			Assert.AreEqual("[begin]->addTen->addTen", final.PathString);
+			Assert.NotNull(final);
+			Assert.False(final.ExecutionInfo.Failed);
+			Assert.Equal(43, final.Value);
+			Assert.Equal("[begin]->addTen->addTen", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void MixBranchingAndMerge() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -235,13 +234,13 @@ namespace Deveel.Workflows {
 			var flow = builder.Build();
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsFalse(final.ExecutionInfo.Failed);
-			Assert.AreEqual(62, final.Value);
-			Assert.AreEqual("[begin]->seed->branch[b1[addTen,addTen]|b2[addTen,addTen]]->merge", final.PathString);
+			Assert.NotNull(final);
+			Assert.False(final.ExecutionInfo.Failed);
+			Assert.Equal(62, final.Value);
+			Assert.Equal("[begin]->seed->branch[b1[addTen,addTen]|b2[addTen,addTen]]->merge", final.PathString);
 		}
 
-		[Test]
+		[Fact]
 		public void BranchFactoryWithMerge() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -266,12 +265,12 @@ namespace Deveel.Workflows {
 			var flow = builder.Build();
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsFalse(final.ExecutionInfo.Failed);
-			Assert.AreEqual(124, final.Value);
+			Assert.NotNull(final);
+			Assert.False(final.ExecutionInfo.Failed);
+			Assert.Equal(124, final.Value);
 		}
 
-		[Test]
+		[Fact]
 		public void ActivityFactoryWithMerge() {
 			var builder = Workflow.Build(workflow => workflow
 				.Activity(activity => activity
@@ -289,9 +288,9 @@ namespace Deveel.Workflows {
 			var flow = builder.Build();
 			var final = flow.Execute();
 
-			Assert.IsNotNull(final);
-			Assert.IsFalse(final.ExecutionInfo.Failed);
-			Assert.AreEqual(28, final.Value);
+			Assert.NotNull(final);
+			Assert.False(final.ExecutionInfo.Failed);
+			Assert.Equal(28, final.Value);
 		}
 
 		#region AddTenActivity
