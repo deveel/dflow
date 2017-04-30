@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Deveel.Workflows", "src\Deveel.Workflows\Deveel.Workflows.xproj", "{5578E7FC-4793-4C72-9156-186E58EA0B43}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveel.Workflows", "src\Deveel.Workflows\Deveel.Workflows.csproj", "{5578E7FC-4793-4C72-9156-186E58EA0B43}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Deveel.Workflows.Tests", "test\Deveel.Workflows.Tests\Deveel.Workflows.Tests.xproj", "{2C227EFA-BBC6-4140-A2A7-A0148AC97BF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveel.Workflows.Tests", "test\Deveel.Workflows.Tests\Deveel.Workflows.Tests.csproj", "{2C227EFA-BBC6-4140-A2A7-A0148AC97BF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
