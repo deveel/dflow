@@ -14,7 +14,7 @@ test_script:
   - .\scripts\appveyor-tests.bat
 artifacts:
   - path: ./nuget/Deveel.Workflows.*.nupkg
-  name: Package
+    name: Package
 deploy:
 - provider: NuGet
   server: https://www.myget.org/F/deveel/api/v2/package
