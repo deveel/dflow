@@ -1,0 +1,23 @@
+version: 1.0.0-{build}
+branches:
+  only:
+  - master
+image: Visual Studio 2017
+init:
+  - ps: $env:LABEL = "r" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
+before_build:
+  - ps: dotnet restore
+build:
+  parallel: true
+  verbosity: minimal
+test_script:
+  - .\scripts\appveyor-tests.bat
+artifacts:
+  - path: ./nuget/Deveel.Workflows.*.nupkg
+  name: Package
+deploy:
+- provider: NuGet
+  server: https://www.myget.org/F/deveel/api/v2/package
+  api_key:
+    secure: gpX+ptyJspEvR0alXYkofdXZm9BFOrhNsxRPHKFmRrFSBbpUvzOScvQmE95mXKt1
+  symbol_server: https://www.myget.org/F/deveel/symbols/api/v2/package
