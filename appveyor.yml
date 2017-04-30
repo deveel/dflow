@@ -13,7 +13,7 @@ build:
 test_script:
   - .\scripts\appveyor-tests.bat
 after_test:
-  - dotnet pack ./src/Deveel.Workflows/Deveel.Workflows.csproj --version-suffix $env:LABEL
+  - ps: dotnet pack ./src/Deveel.Workflows/Deveel.Workflows.csproj --version-suffix $env:LABEL
 artifacts:
   - path: ./nuget/Deveel.Workflows.*.nupkg
     name: Package
