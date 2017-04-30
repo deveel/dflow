@@ -1,1 +1,1 @@
-dotnet test -f netcoreapp1.1 -c Release %APPVEYOR_BUILD_FOLDER%\test\Deveel.Workflows.Tests\Deveel.Workflows.Tests.csproj
+dotnet test -f netcoreapp1.0 -c Release %APPVEYOR_BUILD_FOLDER%\test\Deveel.Workflows.Tests\Deveel.Workflows.Tests.csproj
