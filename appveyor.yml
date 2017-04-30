@@ -13,7 +13,7 @@ build:
 test_script:
   - .\scripts\appveyor-tests.bat
 after_test:
-  - dotnet pack ./src/Devee.Workflows.csproj
+  - dotnet pack ./src/Deveel.Workflows.csproj
 artifacts:
   - path: ./nuget/Deveel.Workflows.*.nupkg
     name: Package
