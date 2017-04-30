@@ -12,6 +12,8 @@ build:
   verbosity: minimal
 test_script:
   - .\scripts\appveyor-tests.bat
+after_test:
+  - dotnet pack ./src/Devee.Workflows.csproj
 artifacts:
   - path: ./nuget/Deveel.Workflows.*.nupkg
     name: Package
