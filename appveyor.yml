@@ -6,7 +6,7 @@ image: Visual Studio 2017
 init:
   - ps: $env:LABEL = "r" + $Env:APPVEYOR_BUILD_NUMBER.PadLeft(5, "0")
 before_build:
-  - ps: dotnet restore ./Deveel.Workflows.sln
+  - ps: dotnet restore
 build:
   parallel: true
   verbosity: minimal
