@@ -4,7 +4,7 @@
     <Description>A lightweight library for designing and executing workflows through .NET</Description>
     <Copyright>2017 Deveel</Copyright>
     <Authors>Antonello Provenzano</Authors>
-    <TargetFramework>netstandard1.6</TargetFramework>
+    <TargetFramework>netstandard1.5</TargetFramework>
     <AssemblyName>Deveel.Workflows</AssemblyName>
     <PackageId>Deveel.Workflows</PackageId>
     <PackageTags>workflow;dotnet;core;activity;activities;job;graph</PackageTags>
