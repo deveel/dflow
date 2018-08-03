@@ -3,8 +3,8 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows
 {
-    public interface IMergeStrategy
+    public interface ITaskExecutor
     {
-        Task MergeAsync(IExecutionContext context);
+        Task ExecuteAsync(IExecutionContext context);
     }
 }
