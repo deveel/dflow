@@ -46,7 +46,7 @@ namespace Deveel.Workflows
         {
             var registry = context.GetRequiredService<IExecutionRegistry>();
 
-            await WaitForStatesAsync(registry, context.ProcessInfo.Id);
+            await WaitForStatesAsync(registry, context.Process.Id);
 
             if (MergeStrategy != null)
                 await MergeStrategy.MergeAsync(context);

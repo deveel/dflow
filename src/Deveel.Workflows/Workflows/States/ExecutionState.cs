@@ -6,15 +6,18 @@ namespace Deveel.Workflows.States
 {
     public sealed class ExecutionState
     {
-        public ExecutionState(string processId, string nodeId, ExecutionStatus status, DateTimeOffset timeStamp)
+        public ExecutionState(string processId, string processInstanceId, string nodeId, ExecutionStatus status, DateTimeOffset timeStamp)
         {
             ProcessId = processId;
+            ProcessInstanceId = processInstanceId;
             NodeId = nodeId;
             TimeStamp = timeStamp.ToUniversalTime();
             Status = status;
         }
 
         public string ProcessId { get; }
+
+        public string ProcessInstanceId { get; }
 
         public string NodeId { get; }
 

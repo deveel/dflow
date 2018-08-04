@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Deveel.Workflows.Actors;
 using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +6,10 @@ namespace Deveel.Workflows
 {
     public abstract class TaskTestsBase
     {
+        protected TaskTestsBase() : this(Guid.NewGuid().ToString())
+        {
+        }
+
         protected TaskTestsBase(string processId)
         {
             Process = CreateProcess(processId);
@@ -17,7 +18,7 @@ namespace Deveel.Workflows
 
         protected Process Process { get; }
 
-        protected IContext Context { get; }
+        protected SystemContext Context { get; }
 
         private Process CreateProcess(string processId)
         {
@@ -27,7 +28,7 @@ namespace Deveel.Workflows
             return process;
         }
 
-        private IContext CreateContext()
+        private SystemContext CreateContext()
         {
             var services = new ServiceCollection();
 

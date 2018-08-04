@@ -24,12 +24,17 @@ namespace Deveel.Workflows
         internal Task<object> CallCreateStateAsync(ExecutionContext context)
             => CreateStateAsync(context);
 
+        internal virtual ExecutionContext CreateScope(ExecutionContext parent)
+        {
+            return parent.CreateScope(this);
+        }
+
         internal async Task ExecuteAsync(ExecutionContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var scope = context.CreateScope(this);
+            var scope = CreateScope(context);
             scope.Start();
 
             try
@@ -43,6 +48,10 @@ namespace Deveel.Workflows
             {
                 scope.Fail(ex);
                 throw;
+            }
+            catch (OperationCanceledException)
+            {
+                // ignore this
             }
             catch (Exception ex)
             {
@@ -60,7 +69,8 @@ namespace Deveel.Workflows
         {
             try
             {
-                var registry = scope.GetRequiredService<IExecutionRegistry>();
+                var registry = scope.GetService<IExecutionRegistry>();
+                if (registry != null)
                 await registry.RegisterAsync(await scope.GetStateAsync());
             }
             catch (Exception)

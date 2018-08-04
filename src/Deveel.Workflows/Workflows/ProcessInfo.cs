@@ -11,6 +11,6 @@ namespace Deveel.Workflows
 
         public string Id { get; }
 
-        public string Name { get; set; }
+        public string Name { get; set; }        
     }
 }

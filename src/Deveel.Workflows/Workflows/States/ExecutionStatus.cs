@@ -6,6 +6,7 @@ namespace Deveel.Workflows.States
     {
         Executing,
         Completed,
-        Failed
+        Failed,
+        Canceled
     }
 }

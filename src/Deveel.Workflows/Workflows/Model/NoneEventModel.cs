@@ -1,4 +1,5 @@
 ﻿using System;
+using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows.Model
 {
@@ -6,7 +7,7 @@ namespace Deveel.Workflows.Model
     {
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
-            return new NoneEvent(Id, Name);
+            return new Event(Id, new NoneEvent(Name));
         }
     }
 }

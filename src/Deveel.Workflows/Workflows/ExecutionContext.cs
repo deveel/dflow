@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
+using Deveel.Workflows.Events;
 using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,38 +11,25 @@ namespace Deveel.Workflows
 {
     public sealed class ExecutionContext : IContext
     {
-        public ExecutionContext(IContext parent, IActor actor, ProcessInfo processInfo, FlowNode node) 
-            : this(parent, new ManualEvent(), actor, processInfo, node)
-        {
-        }
-
-        public ExecutionContext(IContext parent, IEvent trigger, IActor actor, ProcessInfo processInfo, FlowNode node)
+        public ExecutionContext(IContext parent, FlowNode node)
         {
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            Actor = actor ?? throw new ArgumentNullException(nameof(actor));
-            Trigger = trigger ?? throw new ArgumentNullException(nameof(trigger));
             Provider = parent.CreateScope();
-            ProcessInfo = processInfo;
             Node = node;
             CancellationToken = CancellationToken.None;
-        }
 
-        public ExecutionContext(ExecutionContext parent, FlowNode node)
-            : this(parent, parent.Trigger, parent.Actor, parent.ProcessInfo, node)
-        {
+            Process = FindProcess();
         }
 
         public IContext Parent { get; }
 
         private IServiceScope Provider { get; }
 
-        public IActor Actor { get; }
-
-        public IEvent Trigger { get; }
-
-        public ProcessInfo ProcessInfo { get; }
+        public ProcessContext Process { get; }
 
         public FlowNode Node { get; }
+
+        public IActor Actor { get; }
 
         public Exception Error { get; private set; }
 
@@ -55,6 +43,20 @@ namespace Deveel.Workflows
 
         public CancellationToken CancellationToken { get; set; }
 
+        private ProcessContext FindProcess()
+        {
+            IContext context = Parent;
+            while (context != null)
+            {
+                if (context is ProcessContext)
+                    return (ProcessContext)context;
+
+                context = context.Parent;
+            }
+
+            throw new InvalidOperationException();
+        }
+
         private void ChangeStatus(ExecutionStatus status, Exception error = null)
         {
             Status = status;
@@ -62,8 +64,7 @@ namespace Deveel.Workflows
 
             if (status == ExecutionStatus.Executing)
                 StartedAt = DateTimeOffset.UtcNow;
-            else if (status == ExecutionStatus.Completed ||
-                     status == ExecutionStatus.Failed)
+            else
                 FinishedAt = DateTimeOffset.UtcNow;
         }
 
@@ -78,9 +79,12 @@ namespace Deveel.Workflows
         internal void Start()
             => ChangeStatus(ExecutionStatus.Executing);
 
+        internal void Cancel()
+            => ChangeStatus(ExecutionStatus.Canceled);
+
         public ExecutionContext CreateScope(FlowNode node)
         {
-            return new ExecutionContext(this, Actor, ProcessInfo, node);
+            return new ExecutionContext(this, node);
         }
 
         public async Task<ExecutionState> GetStateAsync()
@@ -94,7 +98,7 @@ namespace Deveel.Workflows
                 timeStamp = FinishedAt ?? DateTimeOffset.UtcNow;
             }
 
-            var state = new ExecutionState(ProcessInfo.Id, Node.Id, Status, timeStamp);
+            var state = new ExecutionState(Process.Id, Process.InstanceId, Node.Id, Status, timeStamp);
             if (Status == ExecutionStatus.Failed)
                 state.Error = Error;
 
