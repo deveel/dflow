@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
+using Deveel.Workflows.Errors;
 using Deveel.Workflows.Events;
 using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
@@ -11,12 +12,16 @@ namespace Deveel.Workflows
 {
     public sealed class ExecutionContext : IContext
     {
+        private readonly CancellationTokenSource tokenSource;
+
         public ExecutionContext(IContext parent, FlowNode node)
         {
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             Provider = parent.CreateScope();
             Node = node;
-            CancellationToken = CancellationToken.None;
+
+            tokenSource = new CancellationTokenSource();
+            CancellationToken = tokenSource.Token;
 
             Process = FindProcess();
         }
@@ -41,7 +46,7 @@ namespace Deveel.Workflows
 
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
-        public CancellationToken CancellationToken { get; set; }
+        public CancellationToken CancellationToken { get; }
 
         private ProcessContext FindProcess()
         {
@@ -68,9 +73,19 @@ namespace Deveel.Workflows
                 FinishedAt = DateTimeOffset.UtcNow;
         }
 
-        internal void Fail(Exception error)
+        internal async Task<bool> FailAsync(Exception error)
         {
             ChangeStatus(ExecutionStatus.Failed, error);
+
+            if (error is IError) {
+                var handler = this.GetService<IErrorHandler>();
+                if (handler != null)
+                    await handler.ThrowErrorAsync(Process.Id, Process.InstanceId, (IError)error, CancellationToken);
+
+                return true;
+            }
+
+            return false;
         }
 
         internal void Complete()
@@ -80,7 +95,17 @@ namespace Deveel.Workflows
             => ChangeStatus(ExecutionStatus.Executing);
 
         internal void Cancel()
-            => ChangeStatus(ExecutionStatus.Canceled);
+        {
+            tokenSource.Cancel();
+
+            ChangeStatus(ExecutionStatus.Canceled);
+        }
+
+        internal void Interrupt()
+        {
+            // TODO: anything else to do here?
+            ChangeStatus(ExecutionStatus.Interrupted);
+        }
 
         public ExecutionContext CreateScope(FlowNode node)
         {

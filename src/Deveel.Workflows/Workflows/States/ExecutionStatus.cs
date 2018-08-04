@@ -7,6 +7,7 @@ namespace Deveel.Workflows.States
         Executing,
         Completed,
         Failed,
+        Interrupted,
         Canceled
     }
 }

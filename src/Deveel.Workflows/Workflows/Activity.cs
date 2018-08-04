@@ -7,6 +7,7 @@ namespace Deveel.Workflows
     public abstract class Activity : FlowNode
     {
         private Action cancelHandle;
+        private Action interruptHandle;
 
         protected Activity(string id) : base(id)
         {
@@ -19,6 +20,7 @@ namespace Deveel.Workflows
         {
             var scope = base.CreateScope(parent);
             cancelHandle = () => scope.Cancel();
+            interruptHandle = () => scope.Interrupt();
 
             foreach (var boundaryEvent in BoundaryEvents)
             {
@@ -30,7 +32,7 @@ namespace Deveel.Workflows
 
         internal void Interupt()
         {
-
+            interruptHandle?.Invoke();
         }
 
         internal void CancelExecution()

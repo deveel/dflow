@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,8 +47,8 @@ namespace Deveel.Workflows
             }
             catch (FlowException ex)
             {
-                scope.Fail(ex);
-                throw;
+                if (!await scope.FailAsync(ex))
+                    throw;
             }
             catch (OperationCanceledException)
             {
@@ -55,8 +56,8 @@ namespace Deveel.Workflows
             }
             catch (Exception ex)
             {
-                scope.Fail(ex);
-                throw new FlowException("The execution of the node failed", ex);
+                if (!await scope.FailAsync(ex))
+                    throw new FlowException("The execution of the node failed", ex);
             }
             finally
             {

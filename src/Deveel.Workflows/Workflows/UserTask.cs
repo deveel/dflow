@@ -34,7 +34,7 @@ namespace Deveel.Workflows
             var user = (User) state;
 
             // TODO: get the process id
-            var assignment = new UserAssignment(context.ProcessId, Id, user, DueDate)
+            var assignment = new UserAssignment(context.Process.Id, Id, user, DueDate)
             {
                 Metadata = new Dictionary<string, object>(Metadata)
             };

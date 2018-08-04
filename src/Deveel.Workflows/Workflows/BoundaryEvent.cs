@@ -45,7 +45,7 @@ namespace Deveel.Workflows
         {
             if (Interrupting)
             {
-                // TODO: interrupt the activity
+                attachedActivity.Interupt();
             }
 
             return Node.ExecuteAsync(context);
