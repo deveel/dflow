@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Expressions
@@ -14,7 +15,7 @@ namespace Deveel.Workflows.Expressions
 
         public override FlowExpressionType NodeType => FlowExpressionType.Group;
 
-        internal override Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

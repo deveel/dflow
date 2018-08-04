@@ -14,10 +14,5 @@ namespace Deveel.Workflows
         public string Name { get; }
 
         public override FlowNodeType NodeType => FlowNodeType.Event;
-
-        internal override Task ExecuteNodeAsync(IExecutionContext context)
-        {
-            return Task.CompletedTask;
-        }
     }
 }

@@ -5,14 +5,14 @@ namespace Deveel.Workflows
 {
     public sealed class DelegateTaskExecutor : ITaskExecutor
     {
-        private readonly Action<IExecutionContext> execute;
+        private readonly Action<ExecutionContext> execute;
 
-        public DelegateTaskExecutor(Action<IExecutionContext> execute)
+        public DelegateTaskExecutor(Action<ExecutionContext> execute)
         {
             this.execute = execute;
         }
 
-        public Task ExecuteAsync(IExecutionContext context)
+        public Task ExecuteAsync(ExecutionContext context)
         {
             execute(context);
             return Task.CompletedTask;

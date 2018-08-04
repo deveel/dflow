@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
 using Deveel.Workflows.BusinessRules;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Deveel.Workflows.Scripts;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,11 +22,10 @@ namespace Deveel.Workflows
             var services = new ServiceCollection();
             services.AddSingleton<IExecutionRegistry, InMemoryExecutionRegistry>();
 
-            var provider = services.BuildServiceProvider().CreateScope();
+            var provider = services.BuildServiceProvider();
+            var system = new SystemContext(provider);
 
-            var context = new ExecutionContext(new User("me"), provider);
-
-            await workflow.ExecuteAsync(context);
+            await workflow.RunAsync(system);
         }
 
         [Fact]
@@ -36,9 +35,8 @@ namespace Deveel.Workflows
             services.AddSingleton<IExecutionRegistry, InMemoryExecutionRegistry>();
             services.AddSingleton<IVariableRegistry, InMemoryVariableRegistry>();
 
-            var provider = services.BuildServiceProvider().CreateScope();
-
-            var context = new ExecutionContext(new User("me"), provider);
+            var provider = services.BuildServiceProvider();
+            var system = new SystemContext(provider);
 
             var processId = "proc1";
             var process = new Process(processId);
@@ -66,9 +64,9 @@ namespace Deveel.Workflows
                 }
             });
 
-            await process.ExecuteAsync(context);
+            await process.RunAsync(system);
 
-            var sum = await context.FindVariableAsync("sum");
+            var sum = await system.FindVariableAsync("sum");
 
             Assert.NotNull(sum);
             Assert.IsType<int>(sum);
@@ -87,17 +85,17 @@ b = i+1;
             services.AddSingleton<IExecutionRegistry, InMemoryExecutionRegistry>();
             services.AddSingleton<IVariableRegistry, InMemoryVariableRegistry>();
 
-            var provider = services.BuildServiceProvider().CreateScope();
+            var provider = services.BuildServiceProvider();
+            var system = new SystemContext(provider);
 
-            var context = new ExecutionContext(new User("me"), provider);
-            await context.SetVariableAsync("a", 2);
+            await system.SetVariableAsync("a", 2);
 
             var processId = "proc1";
             var process = new Process(processId);
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine()));
 
-            await process.ExecuteAsync(context);
+            await process.RunAsync(system);
         }
 
         [Fact]
@@ -111,17 +109,17 @@ b = i+1;
             services.AddSingleton<IVariableRegistry, InMemoryVariableRegistry>();
             services.AddSingleton<IRulesProvider>(ruleProvider);
 
-            var provider = services.BuildServiceProvider().CreateScope();
+            var provider = services.BuildServiceProvider();
+            var system = new SystemContext(provider);
 
-            var context = new ExecutionContext(new User("me"), provider);
-            await context.SetVariableAsync("a", 2);
+            await system.SetVariableAsync("a", 2);
 
             var processId = "proc1";
             var process = new Process(processId);
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new BusinessRuleTask("bizTask", "bizRule1"));
 
-            await process.ExecuteAsync(context);
+            await process.RunAsync(system);
 
         }
 

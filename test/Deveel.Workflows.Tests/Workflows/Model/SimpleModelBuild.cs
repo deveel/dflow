@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -33,13 +33,13 @@ namespace Deveel.Workflows.Model
                 }
             };
 
-            var context = new Mock<IExecutionContext>();
+            var context = new Mock<IContext>();
             context.Setup(x => x.GetService(It.Is<Type>(type => typeof(IUserQuery).IsAssignableFrom(type)))).Returns(new MockUserQuery());
 
             var process = model.Build(context.Object);
 
             Assert.NotNull(process);
-            Assert.Equal(model.Id, process.Id);
+            Assert.Equal(model.Id, process.ProcessInfo.Id);
         }
 
         [Fact]
@@ -90,15 +90,14 @@ namespace Deveel.Workflows.Model
             var scope = new ServiceCollection()
                 .AddSingleton<IUserQuery>(userQuery.Object)
                 .AddSingleton<IVariableRegistry, InMemoryVariableRegistry>()
-                .BuildServiceProvider()
-                .CreateScope();
+                .BuildServiceProvider();
 
-            var context = new ExecutionContext(new SystemUser(), scope);
+            var context = new SystemContext(scope);
 
             var process = model.Build(context);
 
             Assert.NotNull(process);
-            Assert.Equal(model.Id, process.Id);
+            Assert.Equal(model.Id, process.ProcessInfo.Id);
         }
 
         class MockUserQuery : IUserQuery

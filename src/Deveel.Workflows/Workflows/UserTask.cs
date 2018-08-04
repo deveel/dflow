@@ -22,22 +22,19 @@ namespace Deveel.Workflows
 
         public IDictionary<string, object> Metadata { get; set; }
 
-        private User User { get; set; }
-
-        public override Task ExecuteAsync(IExecutionContext context)
+        protected override async Task<object> CreateStateAsync(ExecutionContext context)
         {
             var query = context.GetRequiredService<IUserQuery>();
-            User = query.FindUserAsync(Assignee).Result;
-
-            return base.ExecuteAsync(context);
+            return await query.FindUserAsync(Assignee);
         }
 
-        internal override async Task ExecuteNodeAsync(IExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var registry = context.GetRequiredService<IAssignmentRegistry>();
+            var user = (User) state;
 
             // TODO: get the process id
-            var assignment = new UserAssignment(null, Id, User, DueDate)
+            var assignment = new UserAssignment(context.ProcessInfo.Id, Id, user, DueDate)
             {
                 Metadata = new Dictionary<string, object>(Metadata)
             };

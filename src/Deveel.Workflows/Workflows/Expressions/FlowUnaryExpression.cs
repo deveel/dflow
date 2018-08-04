@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Expressions
@@ -15,9 +15,13 @@ namespace Deveel.Workflows.Expressions
 
         public FlowExpression Operand { get; }
 
-        internal override Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override async Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var constant = await Operand.ReduceAsync(context, cancellationToken);
+            if (constant.NodeType != FlowExpressionType.Constant)
+                throw new FlowExpressionException("It was not possible to reduce to a constant");
+
+            return Constant(UnaryOperator.Compute(NodeType, ((FlowConstantExpression) constant).Value));
         }
     }
 }

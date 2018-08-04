@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
+using Deveel.Workflows.Variables;
 
 namespace Deveel.Workflows.Expressions
 {
@@ -14,9 +16,15 @@ namespace Deveel.Workflows.Expressions
 
         public override FlowExpressionType NodeType => FlowExpressionType.Variable;
 
-        internal override Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override async Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var variable = await context.FindVariableAsync(VariableName);
+            if (variable == null)
+                throw new FlowExpressionException($"Could not resolve variable '{VariableName}' in the context");
+
+            return Constant(variable);
         }
     }
 }

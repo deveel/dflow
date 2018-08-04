@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using Deveel.Workflows.Actors;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
@@ -17,7 +17,7 @@ namespace Deveel.Workflows
 
         protected Process Process { get; }
 
-        protected IExecutionContext Context { get; }
+        protected IContext Context { get; }
 
         private Process CreateProcess(string processId)
         {
@@ -27,7 +27,7 @@ namespace Deveel.Workflows
             return process;
         }
 
-        private IExecutionContext CreateContext()
+        private IContext CreateContext()
         {
             var services = new ServiceCollection();
 
@@ -36,7 +36,7 @@ namespace Deveel.Workflows
             AddServices(services);
 
             var provider = services.BuildServiceProvider();
-            return new ExecutionContext(new SystemUser(), provider.CreateScope());
+            return new SystemContext(provider);
         }
 
         protected virtual void AddServices(IServiceCollection services)

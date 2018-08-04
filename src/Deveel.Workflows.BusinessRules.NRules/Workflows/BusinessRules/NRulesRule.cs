@@ -21,7 +21,7 @@ namespace Deveel.Workflows.BusinessRules
 
         public string Name { get; }
 
-        public async Task ExecuteAsync(IExecutionContext context, CancellationToken cancellationToken)
+        public async Task ExecuteAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             var variables = await context.GetVariablesAsync();
 

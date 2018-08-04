@@ -46,7 +46,7 @@ namespace Deveel.Workflows
         [Fact]
         public async Task YouCompletedTheTask()
         {
-            await Process.ExecuteAsync(Context);
+            await Process.RunAsync(Context);
         }
     }
 }

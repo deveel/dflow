@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using Deveel.Workflows.Variables;
 
 namespace Deveel.Workflows.Expressions
 {
@@ -19,7 +21,7 @@ namespace Deveel.Workflows.Expressions
 
         public override FlowExpressionType NodeType => FlowExpressionType.Assign;
 
-        internal override Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

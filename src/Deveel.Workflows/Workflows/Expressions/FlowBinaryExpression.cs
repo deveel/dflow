@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Expressions
@@ -20,7 +21,7 @@ namespace Deveel.Workflows.Expressions
 
         public FlowExpression Right { get; }
 
-        private async Task<FlowExpression[]> ReduceSides(IExecutionContext context)
+        private async Task<FlowExpression[]> ReduceSides(IContext context, CancellationToken cancellationToken)
         {
             var info = new List<BinaryReduceInfo> {
                 new BinaryReduceInfo {Expression = Left, Offset = 0},
@@ -29,7 +30,7 @@ namespace Deveel.Workflows.Expressions
 
             foreach (var evaluateInfo in info)
             {
-                evaluateInfo.Expression = await evaluateInfo.Expression.ReduceAsync(context);
+                evaluateInfo.Expression = await evaluateInfo.Expression.ReduceAsync(context, cancellationToken);
             }
 
             return info.OrderBy(x => x.Offset)
@@ -37,9 +38,9 @@ namespace Deveel.Workflows.Expressions
                 .ToArray();
         }
 
-        internal override async Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override async Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
-            var sides = await ReduceSides(context);
+            var sides = await ReduceSides(context, cancellationToken);
 
             var left = sides[0];
             var right = sides[1];

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Expressions
@@ -14,9 +15,11 @@ namespace Deveel.Workflows.Expressions
 
         public object Value { get; }
 
-        internal override Task<FlowExpression> ReduceAsync(IExecutionContext context)
+        public override Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            cancellationToken.ThrowIfCancellationRequested();
+
+            return Task.FromResult<FlowExpression>(this);
         }
     }
 }

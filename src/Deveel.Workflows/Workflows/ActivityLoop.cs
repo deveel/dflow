@@ -19,12 +19,17 @@ namespace Deveel.Workflows
 
         public FlowExpression Condition { get; }
 
-        internal override async Task ExecuteNodeAsync(IExecutionContext context)
+        protected override Task<object> CreateStateAsync(ExecutionContext context)
+        {
+            return Activity.CallCreateStateAsync(context);
+        }
+
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             do
             {
-                await Activity.ExecuteNodeAsync(context);
-            } while (await Condition.IsTrueAsync(context));
+                await Activity.CallExecuteNodeAsync(state, context);
+            } while (await Condition.IsTrueAsync(context, context.CancellationToken));
         }
     }
 }

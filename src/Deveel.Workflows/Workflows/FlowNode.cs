@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
@@ -16,22 +16,65 @@ namespace Deveel.Workflows
 
         public abstract FlowNodeType NodeType { get; }
 
-        public virtual async Task ExecuteAsync(IExecutionContext context)
+        protected virtual Task<object> CreateStateAsync(ExecutionContext context)
+        {
+            return Task.FromResult<object>(null);
+        }
+
+        internal Task<object> CallCreateStateAsync(ExecutionContext context)
+            => CreateStateAsync(context);
+
+        internal async Task ExecuteAsync(ExecutionContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
 
-            var registry = context.GetRequiredService<IExecutionRegistry>();
-            var scope = context.CreateScope();
+            var scope = context.CreateScope(this);
+            scope.Start();
 
-            await ExecuteNodeAsync(scope);
+            try
+            {
+                var state = await CreateStateAsync(context);
+                await ExecuteNodeAsync(state, scope);
 
-            await registry.RegisterAsync(Id, scope);
+                scope.Complete();
+            }
+            catch (FlowException ex)
+            {
+                scope.Fail(ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                scope.Fail(ex);
+                throw new FlowException("The execution of the node failed", ex);
+            }
+            finally
+            {
+                await RegisterState(scope);
+            }
+
         }
 
-        internal virtual Task ExecuteNodeAsync(IExecutionContext context)
+        private async Task RegisterState(ExecutionContext scope)
         {
-            throw new NotImplementedException();
+            try
+            {
+                var registry = scope.GetRequiredService<IExecutionRegistry>();
+                await registry.RegisterAsync(await scope.GetStateAsync());
+            }
+            catch (Exception)
+            {
+                // TODO: log this error
+            }
+
+        }
+
+        protected abstract Task ExecuteNodeAsync(object state, ExecutionContext context);
+
+        internal Task CallExecuteNodeAsync(object state, ExecutionContext context)
+        {
+            return ExecuteNodeAsync(state, context);
         }
     }
 }

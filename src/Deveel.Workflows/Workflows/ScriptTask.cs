@@ -25,27 +25,26 @@ namespace Deveel.Workflows
 
         public IEnumerable<Assembly> References { get; set; }
 
-        private IScriptingExecutor Executor { get; set; }
-
-        public override Task ExecuteAsync(IExecutionContext context)
+        protected override Task<object> CreateStateAsync(ExecutionContext context)
         {
-            Executor = Engine.CreateExecutor(Code, new ScriptInfo
+            var executor = Engine.CreateExecutor(Code, new ScriptInfo
             {
                 Imports = Imports,
                 References = References
             });
 
-            return base.ExecuteAsync(context);
+            return Task.FromResult<object>(executor);
         }
 
-        internal override async Task ExecuteNodeAsync(IExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var registry = context.GetRequiredService<IVariableRegistry>();
             var variables = await registry.GetVariablesAsync();
+            var executor = (IScriptingExecutor) state;
 
             var globals = new ScriptGlobals(context, variables.ToDictionary(x => x.Name, x => x.Value));
 
-            var result = Executor.ExecuteAsync(globals);
+            var result = executor.ExecuteAsync(globals);
 
             if (globals.VariablesSet)
             {

@@ -15,19 +15,16 @@ namespace Deveel.Workflows
 
         public string RuleId { get; }
 
-        private IRule Rule { get; set; }
-
-        public override async Task ExecuteAsync(IExecutionContext context)
+        protected override async Task<object> CreateStateAsync(ExecutionContext context)
         {
             var repository = context.GetRequiredService<IRulesProvider>();
-            Rule = await repository.FindRuleAsync(RuleId);
-
-            await base.ExecuteAsync(context);
+            return await repository.FindRuleAsync(RuleId);
         }
 
-        internal override Task ExecuteNodeAsync(IExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            return Rule.ExecuteAsync(context, CancellationToken.None);
+            var rule = (IRule) state;
+            return rule.ExecuteAsync(context, CancellationToken.None);
         }
     }
 }

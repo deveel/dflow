@@ -10,7 +10,7 @@ namespace Deveel.Workflows
         {
         }
 
-        internal override Task ExecuteNodeAsync(IExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             return Task.CompletedTask;
         }

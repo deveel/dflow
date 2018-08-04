@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
@@ -22,7 +22,7 @@ namespace Deveel.Workflows
             Flows = new GatewayFlowCollection<InGatewayFlow>(this);
         }
 
-        public JoinGateway(string id, Action<IExecutionContext> merge)
+        public JoinGateway(string id, Action<ExecutionContext> merge)
             : this(id, new DelegatedMergeStrategy(merge))
         {
         }
@@ -42,23 +42,23 @@ namespace Deveel.Workflows
                 throw new ArgumentException();
         }
 
-        internal override async Task ExecuteNodeAsync(IExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var registry = context.GetRequiredService<IExecutionRegistry>();
 
-            await WaitForStatesAsync(registry);
+            await WaitForStatesAsync(registry, context.ProcessInfo.Id);
 
             if (MergeStrategy != null)
                 await MergeStrategy.MergeAsync(context);
         }
 
-        private async Task WaitForStatesAsync(IExecutionRegistry listener)
+        private async Task WaitForStatesAsync(IExecutionRegistry listener, string processId)
         {
             var inputRefs = Flows.Select(x => x.ObjectRef).ToList();
 
             foreach (var id in inputRefs)
             {
-                await listener.FindStateAsync(id);
+                await listener.FindStateAsync(processId, id);
             }
         }
     }

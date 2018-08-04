@@ -3,12 +3,16 @@ using Deveel.Workflows.Expressions;
 
 namespace Deveel.Workflows.Model
 {
-    public class ProcessModel : ActivityModel
+    public class ProcessModel
     {
         public ProcessModel()
         {
             Sequence = new ProcessSequenceModel();
         }
+
+        public string Id { get; set; }
+
+        public string Name { get; set; }
 
         public ProcessSequenceModel Sequence { get; set; }
 
@@ -16,17 +20,7 @@ namespace Deveel.Workflows.Model
 
         public EventModel EndEvent { get; set; }
 
-        internal override FlowNode BuildNode(ModelBuildContext context)
-        {
-            var process = BuildProcess(context);
-
-            if (LoopCondition != null)
-                process = new ActivityLoop(process, FlowExpression.Parse(LoopCondition));
-
-            return process;
-        }
-
-        private Activity BuildProcess(ModelBuildContext context)
+        private Process BuildProcess(ModelBuildContext context)
         {
             if (String.IsNullOrWhiteSpace(Id))
                 throw new InvalidOperationException();
@@ -45,7 +39,17 @@ namespace Deveel.Workflows.Model
         public Process Build(IContext context)
         {
             var buildContext = new ModelBuildContext(Id, context);
-            return (Process) BuildNode(buildContext);
+            var process = new Process(new ProcessInfo(Id)
+            {
+                Name = Name
+            });
+
+            foreach (var node in Sequence)
+            {
+                process.Sequence.Add(node.BuildNode(buildContext));
+            }
+
+            return process;
         }
     }
 }

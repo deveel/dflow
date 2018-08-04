@@ -8,6 +8,6 @@ namespace Deveel.Workflows.BusinessRules
     {
         string Name { get; }
 
-        Task ExecuteAsync(IExecutionContext context, CancellationToken cancellationToken);
+        Task ExecuteAsync(ExecutionContext context, CancellationToken cancellationToken);
     }
 }

@@ -6,18 +6,16 @@ namespace Deveel.Workflows
 {
     public sealed class ProcessSequence : IEnumerable<FlowNode>
     {
-        private readonly LinkedList<FlowNode> objects;
-        private readonly Process process;
+        private readonly LinkedList<FlowNode> nodes;
 
-        internal ProcessSequence(Process process)
+        internal ProcessSequence()
         {
-            this.process = process;
-            objects = new LinkedList<FlowNode>();
+            nodes = new LinkedList<FlowNode>();
         }
 
         private LinkedListNode<FlowNode> FindNode(string id)
         {
-            var node = objects.First;
+            var node = nodes.First;
             while(node != null)
             {
                 if (node.Value != null && node.Value.Id == id)
@@ -44,7 +42,7 @@ namespace Deveel.Workflows
             if (Exists(node.Id))
                 throw new ArgumentException();
 
-            objects.AddLast(node);
+            nodes.AddLast(node);
         }
 
         public void AddAfter(string objName, FlowNode node)
@@ -54,7 +52,7 @@ namespace Deveel.Workflows
             if (listNode == null)
                 throw new ArgumentException();
 
-            objects.AddAfter(listNode, node);
+            nodes.AddAfter(listNode, node);
         }
 
         public void AddBefore(string objName, FlowNode node)
@@ -64,7 +62,7 @@ namespace Deveel.Workflows
             if (listNode == null)
                 throw new ArgumentException();
 
-            objects.AddBefore(listNode, node);
+            nodes.AddBefore(listNode, node);
         }
 
         public void Remove(string id)
@@ -73,17 +71,17 @@ namespace Deveel.Workflows
             if (node == null)
                 throw new ArgumentException($"None object with ID '{id}' in sequence");
 
-            objects.Remove(node);
+            nodes.Remove(node);
         }
 
         public void Clear()
         {
-            objects.Clear();
+            nodes.Clear();
         }
 
         public IEnumerator<FlowNode> GetEnumerator()
         {
-            return objects.GetEnumerator();
+            return nodes.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

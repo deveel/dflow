@@ -6,13 +6,13 @@ namespace Deveel.Workflows.Scripts
 {
     public sealed class ScriptGlobals
     {
-        internal ScriptGlobals(IExecutionContext context, IDictionary<string, object> variables)
+        internal ScriptGlobals(ExecutionContext context, IDictionary<string, object> variables)
         {
             Context = context;
             Variables = new Dictionary<string, object>(variables);
         }
 
-        public IExecutionContext Context { get; }
+        public ExecutionContext Context { get; }
 
         public IActor Actor => Context.Actor;
 

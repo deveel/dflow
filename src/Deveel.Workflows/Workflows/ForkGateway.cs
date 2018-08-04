@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
@@ -16,21 +17,10 @@ namespace Deveel.Workflows
 
         public ICollection<SimpleGatewayFlow> Flows { get; }
 
-        public override async Task ExecuteAsync(IExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            var registry = context.GetRequiredService<IExecutionRegistry>();
-
-            var scope = context.CreateScope();
-
-            foreach (var obj in Flows)
-            {
-                await obj.Node.ExecuteAsync(scope);
-            }
-
-            await registry.RegisterAsync(Id, scope);
+            var tasks = Flows.Select(x => x.Node.ExecuteAsync(context));
+            return Task.WhenAll(tasks);
         }
 
         protected override IEnumerator<IGatewayFlow> GetEnumerator()

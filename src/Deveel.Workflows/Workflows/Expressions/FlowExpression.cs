@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Antlr4.Runtime;
 
@@ -72,7 +73,7 @@ namespace Deveel.Workflows.Expressions
             return -1;
         }
 
-        internal abstract Task<FlowExpression> ReduceAsync(IExecutionContext context);
+        public abstract Task<FlowExpression> ReduceAsync(IContext context, CancellationToken cancellationToken);
 
         public virtual FlowExpression Accept(FlowExpressionVisitor visitor)
         {

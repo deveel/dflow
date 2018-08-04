@@ -30,14 +30,16 @@ namespace Deveel.Workflows
             }
         }
 
-        public override async Task ExecuteAsync(IExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
+            context.CancellationToken.ThrowIfCancellationRequested();
+
             var conditionsFlows = Flows.Where(x => x.Condition != null);
             var elseFlow = Flows.SingleOrDefault(x => x.Condition == null);
 
             foreach(var flow in conditionsFlows)
             {
-                if (await flow.Condition.IsTrueAsync(context))
+                if (await flow.Condition.IsTrueAsync(context, context.CancellationToken))
                 {
                     await flow.Node.ExecuteAsync(context);
                     return;

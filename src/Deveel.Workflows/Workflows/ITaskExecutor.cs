@@ -5,6 +5,6 @@ namespace Deveel.Workflows
 {
     public interface ITaskExecutor
     {
-        Task ExecuteAsync(IExecutionContext context);
+        Task ExecuteAsync(ExecutionContext context);
     }
 }
