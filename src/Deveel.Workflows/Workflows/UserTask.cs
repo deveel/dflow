@@ -8,29 +8,50 @@ namespace Deveel.Workflows
 {
     public sealed class UserTask : TaskBase
     {
-        public UserTask(string id, User user, DateTimeOffset? dueDate)
+        public UserTask(string id, string assignee, DateTimeOffset? dueDate = null)
             : base(id) {
-            User = user;
+            Assignee = assignee;
             DueDate = dueDate;
 
             Metadata = new Dictionary<string, object>();
         }
 
-        public User User { get; set; }
+        public string Assignee { get; set; }
 
         public DateTimeOffset? DueDate { get; set; }
 
-        public IDictionary<string, object> Metadata { get; }
+        public IDictionary<string, object> Metadata { get; set; }
+
+        private User User { get; set; }
+
+        public override Task ExecuteAsync(IExecutionContext context)
+        {
+            var query = context.GetRequiredService<IUserQuery>();
+            User = query.FindUserAsync(Assignee).Result;
+
+            return base.ExecuteAsync(context);
+        }
 
         internal override async Task ExecuteNodeAsync(IExecutionContext context)
         {
             var registry = context.GetRequiredService<IAssignmentRegistry>();
-            var assignment = new UserAssignment(User, DueDate)
+
+            // TODO: get the process id
+            var assignment = new UserAssignment(null, Id, User, DueDate)
             {
                 Metadata = new Dictionary<string, object>(Metadata)
             };
 
-            await registry.CreateAssignmentAsync(assignment);
+            // this blocks the process until the assignment is done
+            var result = await registry.AssignAsync(assignment);
+
+            if (!result.Completed)
+                throw new InvalidOperationException();
+
+            if (DueDate != null && result.CompletedAt > DueDate)
+                throw new InvalidOperationException();
+
+            // TODO: load into the metadata coming from the completed assignment
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Deveel.Workflows.Actors;
-using Deveel.Workflows.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows.Model
@@ -13,10 +12,7 @@ namespace Deveel.Workflows.Model
 
         internal override TaskBase BuildTask(ModelBuildContext context)
         {
-            var query = context.Context.GetRequiredService<IUserQuery>();
-            var actor = query.FindUserAsync(Assignee).Result;
-
-            return new UserTask(Id, actor, DueDate);
+            return new UserTask(Id, Assignee, DueDate);
         }
     }
 }

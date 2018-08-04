@@ -6,8 +6,6 @@ namespace Deveel.Workflows.Actors
 {
     public interface IAssignmentRegistry
     {
-        Task CreateAssignmentAsync(UserAssignment assignment);
-
-        Task<IList<UserAssignment>> FindByUserAsync(string userName);
+        Task<AssignmentResult> AssignAsync(UserAssignment assignment);
     }
 }
