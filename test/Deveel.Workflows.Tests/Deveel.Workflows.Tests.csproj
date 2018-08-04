@@ -13,6 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Deveel.Workflows.BusinessRules.NRules\Deveel.Workflows.BusinessRules.NRules.csproj" />
+    <ProjectReference Include="..\..\src\Deveel.Workflows.Scripting.CSharp\Deveel.Workflows.Scripting.CSharp.csproj" />
     <ProjectReference Include="..\..\src\Deveel.Workflows\Deveel.Workflows.csproj" />
   </ItemGroup>
 

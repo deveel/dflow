@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
+using Deveel.Workflows.BusinessRules;
 using Deveel.Workflows.Infrastructure;
+using Deveel.Workflows.Scripts;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
+using NRules.Fluent.Dsl;
 using Xunit;
 
 namespace Deveel.Workflows
@@ -71,5 +74,75 @@ namespace Deveel.Workflows
             Assert.IsType<int>(sum);
             Assert.Equal(5, sum);
         }
+
+        [Fact]
+        public async Task WithCSharpScriptTask()
+        {
+            const string script = @"
+int b;
+for(int i = 0; i < a; i++) {
+b = i+1;
+}";
+            var services = new ServiceCollection();
+            services.AddSingleton<IExecutionRegistry, InMemoryExecutionRegistry>();
+            services.AddSingleton<IVariableRegistry, InMemoryVariableRegistry>();
+
+            var provider = services.BuildServiceProvider().CreateScope();
+
+            var context = new ExecutionContext(new User("me"), provider);
+            await context.SetVariableAsync("a", 2);
+
+            var processId = "proc1";
+            var process = new Process(processId);
+            process.Sequence.Add(new ManualTask("some manual"));
+            process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine()));
+
+            await process.ExecuteAsync(context);
+        }
+
+        [Fact]
+        public async Task WithBusinessRuleTask()
+        {
+            var ruleProvider = new NRulesRulesProvider();
+            ruleProvider.AddRules("bizRule1", typeof(BusinessRule));
+
+            var services = new ServiceCollection();
+            services.AddSingleton<IExecutionRegistry, InMemoryExecutionRegistry>();
+            services.AddSingleton<IVariableRegistry, InMemoryVariableRegistry>();
+            services.AddSingleton<IRulesProvider>(ruleProvider);
+
+            var provider = services.BuildServiceProvider().CreateScope();
+
+            var context = new ExecutionContext(new User("me"), provider);
+            await context.SetVariableAsync("a", 2);
+
+            var processId = "proc1";
+            var process = new Process(processId);
+            process.Sequence.Add(new ManualTask("some manual"));
+            process.Sequence.Add(new BusinessRuleTask("bizTask", "bizRule1"));
+
+            await process.ExecuteAsync(context);
+
+        }
+
+        #region BusinessRule
+
+        class BusinessRule : Rule
+        {
+            public override void Define()
+            {
+                Variable a = null;
+
+                When()
+                    .Match(() => a)
+                    .Exists<Variable>(v => v.Name == "a");
+
+                Then()
+                    .Do(c => Console.Out.WriteLine(a.Value));
+
+            }
+        }
+
+        #endregion
     }
 }

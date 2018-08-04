@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,15 @@ namespace Deveel.Workflows.Variables
                 throw new InvalidOperationException();
 
             await registry.SetVariableAsync(new Variable(name, value));
+        }
+
+        public static Task<IList<Variable>> GetVariablesAsync(this IContext context)
+        {
+            var registry = context.GetService<IVariableRegistry>();
+            if (registry == null)
+                return Task.FromResult<IList<Variable>>(new List<Variable>());
+
+            return registry.GetVariablesAsync();
         }
     }
 }

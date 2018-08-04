@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Variables
@@ -25,6 +26,11 @@ namespace Deveel.Workflows.Variables
                 return Task.FromResult<Variable>(null);
 
             return Task.FromResult(variable);
+        }
+
+        public Task<IList<Variable>> GetVariablesAsync()
+        {
+            return Task.FromResult((IList<Variable>) variables.Values.ToList());
         }
     }
 }

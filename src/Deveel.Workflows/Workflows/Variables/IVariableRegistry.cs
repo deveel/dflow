@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Deveel.Workflows.Infrastructure;
 
 namespace Deveel.Workflows.Variables
@@ -8,5 +9,6 @@ namespace Deveel.Workflows.Variables
         Task SetVariableAsync(Variable variable);
 
         Task<Variable> FindVariableAsync(string name);
+        Task<IList<Variable>> GetVariablesAsync();
     }
 }
