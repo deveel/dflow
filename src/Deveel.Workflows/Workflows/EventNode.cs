@@ -6,9 +6,9 @@ namespace Deveel.Workflows
 {
     public class EventNode : FlowNode
     {
-        private readonly Event @event;
+        private readonly FlowEventHandler @event;
 
-        public EventNode(string id, Event @event)
+        public EventNode(string id, FlowEventHandler @event)
         : base(id)
         {
             this.@event = @event;
@@ -19,10 +19,10 @@ namespace Deveel.Workflows
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var eventContext = @event.CreateContext(context);
-            eventContext.Attach(async (e, c, s) => await ReactAsync(e, state, c));
+            eventContext.Attach(async (c, s) => await ReactAsync(state, c));
         }
 
-        protected virtual Task ReactAsync(Event source, object state, ExecutionContext context)
+        protected virtual Task ReactAsync(object state, ExecutionContext context)
         {
             return Task.CompletedTask;
         }

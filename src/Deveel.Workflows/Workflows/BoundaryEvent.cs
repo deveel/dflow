@@ -7,12 +7,12 @@ namespace Deveel.Workflows
 {
     public sealed class BoundaryEvent : IDisposable
     {
-        private Event source;
+        private FlowEventHandler source;
         private EventContext eventContext;
-        private Action<Event, ExecutionContext, object> callback;
+        private Action<ExecutionContext, object> callback;
         private Activity attachedActivity;
 
-        public BoundaryEvent(Event source, FlowNode node)
+        public BoundaryEvent(FlowEventHandler source, FlowNode node)
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
             this.source = source;
@@ -33,7 +33,7 @@ namespace Deveel.Workflows
         internal void AttachTo(Activity activity)
         {
             attachedActivity = activity;
-            callback = async (e,c, s) => await ReactAsync(e, c, s);
+            callback = async (c, s) => await ReactAsync(c, s);
         }
 
         internal Task BeginAsync()
@@ -49,7 +49,7 @@ namespace Deveel.Workflows
             }
         }
 
-        private Task ReactAsync(Event e, ExecutionContext context, object state)
+        private Task ReactAsync(ExecutionContext context, object state)
         {
             if (Interrupting)
             {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Messaging
 {
-    public sealed class MessageEventSource : EventSource
+    public sealed class MessageEventSource : FlowEventSource
     {
         private IMessageReceiver receiver;
         private Dictionary<MessageSubscription, Task> waiters;
@@ -23,7 +23,7 @@ namespace Deveel.Workflows.Messaging
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEvent)context.Event;
+            var messageEvent = (MessageEvent)context.EventHandler;
 
             if (!waiters.ContainsKey(messageEvent.Subscription))
             {
@@ -44,7 +44,7 @@ namespace Deveel.Workflows.Messaging
 
         protected override Task DetachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEvent)context.Event;
+            var messageEvent = (MessageEvent)context.EventHandler;
 
             if (events.ContainsKey(messageEvent.Subscription))
             {

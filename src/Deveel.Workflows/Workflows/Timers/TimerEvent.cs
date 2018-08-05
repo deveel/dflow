@@ -4,7 +4,7 @@ using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class TimerEvent : Event
+    public sealed class TimerEvent : FlowEventHandler
     {
         public TimerEvent(TimerEventSource eventSource, string name, ScheduleInfo scheduleInfo)
             : base(eventSource, name) {

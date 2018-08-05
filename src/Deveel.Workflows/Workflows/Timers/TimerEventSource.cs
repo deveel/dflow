@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class TimerEventSource : EventSource
+    public sealed class TimerEventSource : FlowEventSource
     {
         private IJobScheduler scheduler;
 
@@ -18,7 +18,7 @@ namespace Deveel.Workflows.Timers
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            var timer = (TimerEvent)context.Event;
+            var timer = (TimerEvent)context.EventHandler;
             var scheduleInfo = timer.ScheduleInfo;
 
             return scheduler.ScheduleAsync(context.EventId.ToString(), scheduleInfo, new ScheduleCallback(context), context.CancellationToken);

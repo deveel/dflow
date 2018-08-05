@@ -2,20 +2,20 @@
 
 namespace Deveel.Workflows.Events
 {
-    public sealed class NoneEvent : Event
+    public sealed class NoneEventHandler : FlowEventHandler
     {
-        public NoneEvent() : this("none")
+        public NoneEventHandler() : this("none")
         {
         }
 
-        public NoneEvent(string name)
+        public NoneEventHandler(string name)
             : base(new NoneEventSource(), name)
         {
         }
 
         #region NoneEventSource
 
-        class NoneEventSource : EventSource
+        class NoneEventSource : FlowEventSource
         {
             public override EventType EventType => EventType.None;
         }

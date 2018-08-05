@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
-    public abstract class EventSource : IDisposable
+    public abstract class FlowEventSource : IDisposable
     {
-        ~EventSource()
+        ~FlowEventSource()
         {
             Dispose(false);
         }

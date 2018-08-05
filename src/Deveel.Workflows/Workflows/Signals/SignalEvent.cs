@@ -3,7 +3,7 @@ using System;
 
 namespace Deveel.Workflows.Signals
 {
-    public sealed class SignalEvent : Event
+    public sealed class SignalEvent : FlowEventHandler
     {
         public SignalEvent(SignalEventSource source, string name) 
             : base(source, name)

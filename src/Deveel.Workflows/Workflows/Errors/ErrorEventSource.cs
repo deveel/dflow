@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Errors
 {
-    public sealed class ErrorEventSource : EventSource
+    public sealed class ErrorEventSource : FlowEventSource
     {
         private IErrorHandler handler;
         private Dictionary<EventId, EventContext> events;
@@ -25,7 +25,7 @@ namespace Deveel.Workflows.Errors
         {
             if (!events.ContainsKey(context.EventId))
             {
-                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.Event.Name, context.CancellationToken));
+                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.EventHandler.EventName, context.CancellationToken));
                 events.Add(context.EventId, context);
             }
 

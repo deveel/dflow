@@ -3,19 +3,19 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
-    public class Event
+    public class FlowEventHandler
     {
-        public Event(EventSource source, string name)
+        public FlowEventHandler(FlowEventSource source, string eventName)
         {
             EventSource = source ?? throw new ArgumentNullException(nameof(source));
-            Name = name;
+            EventName = eventName;
         }
 
-        public string Name { get; }
+        public string EventName { get; }
 
         public EventType EventType => EventSource.EventType;
 
-        public EventSource EventSource { get; }
+        public FlowEventSource EventSource { get; }
 
         protected virtual EventContext OnCreateContext(ExecutionContext context)
         {

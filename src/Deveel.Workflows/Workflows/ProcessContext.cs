@@ -14,12 +14,11 @@ namespace Deveel.Workflows
         private CancellationTokenSource tokenSource;
         private List<ExecutionContext> currentContexts;
 
-        internal ProcessContext(SystemContext parent, Process process, IActor actor, Event trigger, string instanceId)
+        internal ProcessContext(SystemContext parent, Process process, IActor actor, string instanceId)
         {
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             Process = process;
             Actor = actor;
-            Trigger = trigger;
             scope = parent.CreateScope();
             InstanceId = instanceId;
 
@@ -52,8 +51,6 @@ namespace Deveel.Workflows
         public string Id => Process.ProcessInfo.Id;
 
         public IActor Actor { get; }
-
-        public Event Trigger { get; }
 
         public ExecutionContext CreateContext(FlowNode node)
         {

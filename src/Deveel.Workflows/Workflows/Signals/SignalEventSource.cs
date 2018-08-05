@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Signals
 {
-    public sealed class SignalEventSource : EventSource
+    public sealed class SignalEventSource : FlowEventSource
     {
         private ISignalRegistry registry;
 
@@ -18,12 +18,12 @@ namespace Deveel.Workflows.Signals
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            return registry.SubscribeAsync(context.Event.Name, new SignalHandler(context), context.CancellationToken);
+            return registry.SubscribeAsync(context.EventHandler.EventName, new SignalHandler(context), context.CancellationToken);
         }
 
         protected override Task DetachContextAsync(EventContext context)
         {
-            return registry.UnsubscribeAsync(context.Event.Name, context.EventId.ToString(), context.CancellationToken);
+            return registry.UnsubscribeAsync(context.EventHandler.EventName, context.EventId.ToString(), context.CancellationToken);
         }
 
         #region SignalHandler

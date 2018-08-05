@@ -28,19 +28,13 @@ namespace Deveel.Workflows
             return provider.GetService(serviceType);
         }
 
-        public ProcessContext CreateContext(Process process, IActor actor, Event trigger, string instanceId)
+        public ProcessContext CreateContext(Process process, IActor actor, string instanceId)
         {
-            return new ProcessContext(this, process, actor, trigger, instanceId);
+            return new ProcessContext(this, process, actor, instanceId);
         }
 
-        public ProcessContext CreateContext(Process process, IActor actor, string instanceId)
-            => CreateContext(process, actor, new NoneEvent(), instanceId);
-
-        public ProcessContext CreateContext(Process process, Event trigger, string instanceId)
-            => CreateContext(process, new SystemUser(), trigger, instanceId);
-
         public ProcessContext CreateContext(Process process, string instanceId)
-            => CreateContext(process, new SystemUser(), new NoneEvent(), instanceId);
+            => CreateContext(process, new SystemUser(), instanceId);
 
         public ProcessContext CreateContext(Process process)
             => CreateContext(process, Guid.NewGuid().ToString());
