@@ -8,7 +8,7 @@ namespace Deveel.Workflows.Model
     {
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
-            var errorSignal = context.Context.GetRequiredService<IErrorSignal>();
+            var errorSignal = context.Context.GetRequiredService<IErrorHandler>();
             var source = new ErrorEventSource(errorSignal);
             var errorEvent = new ErrorEvent(source, Name);
 

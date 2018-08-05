@@ -8,13 +8,13 @@ namespace Deveel.Workflows.Errors
 {
     public sealed class ErrorEventSource : EventSource
     {
-        private IErrorSignal errorSignal;
+        private IErrorHandler handler;
         private Dictionary<EventId, EventContext> events;
         private Dictionary<EventId, Task> waiters;
 
-        public ErrorEventSource(IErrorSignal errorSignal)
+        public ErrorEventSource(IErrorHandler handler)
         {
-            this.errorSignal = errorSignal;
+            this.handler = handler;
             events = new Dictionary<EventId, EventContext>();
             waiters = new Dictionary<EventId, Task>();
         }
@@ -50,7 +50,7 @@ namespace Deveel.Workflows.Errors
 
         private async Task WaitForErrorAsync(EventId eventId, string errorName, CancellationToken cancellationToken)
         {
-            var error = await errorSignal.WaitForErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, cancellationToken);
+            var error = await handler.CatchErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, cancellationToken);
 
             if (error != null && events.TryGetValue(eventId, out EventContext errorEvent))
             {
@@ -76,7 +76,7 @@ namespace Deveel.Workflows.Errors
                 events.Clear();
             }
 
-            errorSignal = null;
+            handler = null;
             base.Dispose(disposing);
         }
     }

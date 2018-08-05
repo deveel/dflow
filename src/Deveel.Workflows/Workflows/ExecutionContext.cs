@@ -91,9 +91,11 @@ namespace Deveel.Workflows
             ChangeStatus(ExecutionStatus.Failed, error);
 
             if (error is IError) {
-                var handler = this.GetService<IErrorHandler>();
+                var handler = this.GetService<IErrorSignaler>();
                 if (handler != null)
-                    await handler.ThrowErrorAsync(Process.Id, Process.InstanceId, (IError)error, CancellationToken);
+                {
+                    await handler.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceId, ((IError)error).Name), CancellationToken);
+                }
 
                 return true;
             }

@@ -6,6 +6,6 @@ namespace Deveel.Workflows.Errors
 {
     public interface IErrorHandler
     {
-        Task ThrowErrorAsync(string processId, string instanceId, IError error, CancellationToken cancellationToken);
+        Task<ThrownError> CatchErrorAsync(string processId, string instanceId, string errorName, CancellationToken cancellationToken);
     }
 }

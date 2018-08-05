@@ -8,7 +8,7 @@ namespace Deveel.Workflows
 {
     public class ErrorBoundaryEventsTests : TaskTestsBase
     {
-        private InMemoryErrorSignal errorSignal;
+        private InMemoryErrorHandler errorSignal;
         private AutoResetEvent catchEvent;
 
         public ErrorBoundaryEventsTests()
@@ -18,11 +18,11 @@ namespace Deveel.Workflows
 
         protected override void AddServices(IServiceCollection services)
         {
-            errorSignal = new InMemoryErrorSignal();
+            errorSignal = new InMemoryErrorHandler();
 
-            services.AddSingleton<IErrorSignal>(errorSignal);
-            services.AddSingleton<InMemoryErrorSignal>(errorSignal);
-            services.AddSingleton<IErrorHandler, InMemoryErrorHandler>();
+            services.AddSingleton<IErrorHandler>(errorSignal);
+            services.AddSingleton<InMemoryErrorHandler>(errorSignal);
+            services.AddSingleton<IErrorSignaler, InMemoryErrorSignaler>();
         }
 
         protected override void OnTaskAdd(ProcessSequence sequence)
