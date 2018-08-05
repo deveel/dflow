@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
@@ -8,10 +9,6 @@ namespace Deveel.Workflows.Events
 
         IEventSource Source { get; }
 
-        void AttachToContext(ExecutionContext context);
-
-        void Attach(Action<IEvent, ExecutionContext> callback);
-
-        void Detach(Action<IEvent, ExecutionContext> callback);
+        Task<IEventContext> CreateContextAsync(ExecutionContext context);
     }
 }

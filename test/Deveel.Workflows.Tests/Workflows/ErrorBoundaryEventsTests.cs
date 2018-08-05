@@ -12,6 +12,8 @@ namespace Deveel.Workflows
 
         protected override void AddServices(IServiceCollection services)
         {
+            errorSignal = new InMemoryErrorSignal();
+
             services.AddSingleton<IErrorSignal>(errorSignal);
             services.AddSingleton<InMemoryErrorSignal>(errorSignal);
             services.AddSingleton<IErrorHandler, InMemoryErrorHandler>();
@@ -19,8 +21,6 @@ namespace Deveel.Workflows
 
         protected override void OnTaskAdd(ProcessSequence sequence)
         {
-            errorSignal = new InMemoryErrorSignal();
-
             var errorEvent = new ErrorEvent(new ErrorEventSource(errorSignal), "err");
 
             sequence.Add(new ServiceTask("task1", c => throw new ErrorException("err"))

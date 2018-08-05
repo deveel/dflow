@@ -5,9 +5,10 @@ using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows
 {
-    public sealed class BoundaryEvent
+    public sealed class BoundaryEvent : IDisposable
     {
         private IEvent source;
+        private IEventContext eventContext;
         private Action<IEvent, ExecutionContext> callback;
         private Activity attachedActivity;
 
@@ -23,22 +24,24 @@ namespace Deveel.Workflows
 
         public EventType EventType => source.Source.EventType;
 
-        internal void Init(ExecutionContext context)
+        internal async Task InitAsync(ExecutionContext context)
         {
-            source.AttachToContext(context);
+            eventContext = await source.CreateContextAsync(context);
+            eventContext.Attach(callback);
         }
 
         internal void AttachTo(Activity activity)
         {
             attachedActivity = activity;
             callback = async (e,c) => await ReactAsync(e, c);
-            source.Attach(callback);
         }
 
         internal void DetachFrom(Activity activity)
         {
             if (activity == attachedActivity)
-                source.Detach(callback);
+            {
+                attachedActivity = null;
+            }
         }
 
         private Task ReactAsync(IEvent e, ExecutionContext context)
@@ -49,6 +52,12 @@ namespace Deveel.Workflows
             }
 
             return Node.ExecuteAsync(context);
+        }
+
+        public void Dispose()
+        {
+            eventContext?.Detach(callback);
+            eventContext?.Dispose();
         }
     }
 }

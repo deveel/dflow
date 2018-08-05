@@ -136,5 +136,10 @@ namespace Deveel.Workflows
         {
             return Provider == null ? null : Provider.ServiceProvider.GetService(serviceType);
         }
+
+        public void Dispose()
+        {
+            Provider?.Dispose();
+        }
     }
 }

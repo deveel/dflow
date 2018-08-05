@@ -16,11 +16,10 @@ namespace Deveel.Workflows
 
         public override FlowNodeType NodeType => FlowNodeType.Event;
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            @event.AttachToContext(context);
-            @event.Attach(async (e, c) => await ReactAsync(e, state, c));
-            return Task.CompletedTask;
+            var eventContext = await @event.CreateContextAsync(context);
+            eventContext.Attach(async (e, c) => await ReactAsync(e, state, c));
         }
 
         protected virtual Task ReactAsync(IEvent source, object state, ExecutionContext context)

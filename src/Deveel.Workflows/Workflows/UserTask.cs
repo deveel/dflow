@@ -33,7 +33,6 @@ namespace Deveel.Workflows
             var registry = context.GetRequiredService<IAssignmentRegistry>();
             var user = (User) state;
 
-            // TODO: get the process id
             var assignment = new UserAssignment(context.Process.Id, Id, user, DueDate)
             {
                 Metadata = new Dictionary<string, object>(Metadata)

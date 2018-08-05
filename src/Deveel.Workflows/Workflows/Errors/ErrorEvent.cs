@@ -1,12 +1,12 @@
 ﻿using Deveel.Workflows.Events;
 using System;
+using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Errors
 {
     public sealed class ErrorEvent : IEvent
     {
         private Action<ErrorEvent, ExecutionContext> callbacks;
-        private ExecutionContext attachedContext;
 
         private string processId;
         private string instanceId;
@@ -15,7 +15,6 @@ namespace Deveel.Workflows.Errors
         {
             Name = name;
             Source = source ?? throw new ArgumentNullException(nameof(source));
-            Source.Attach(this);
         }
 
         public string Name { get; }
@@ -24,41 +23,15 @@ namespace Deveel.Workflows.Errors
 
         public ErrorEventSource Source { get; }
 
-        void IEvent.Attach(Action<IEvent, ExecutionContext> callback)
+        Task<IEventContext> IEvent.CreateContextAsync(ExecutionContext context)
         {
-            if (callbacks == null)
-            {
-                callbacks = (Action<ErrorEvent, ExecutionContext>) callback;
-            } else
-            {
-                callbacks = (Action<ErrorEvent, ExecutionContext>)Delegate.Combine(callbacks, callback);
-            }
-        }
-
-        void IEvent.AttachToContext(ExecutionContext context)
-        {
-            attachedContext = context;
-            processId = context.Process.Id;
-            instanceId = context.Process.InstanceId;
-        }
-
-        void IEvent.Detach(Action<IEvent, ExecutionContext> callback)
-        {
-            if (callbacks != null)
-                callbacks = (Action<ErrorEvent, ExecutionContext>)Delegate.Remove(callbacks, callback);
-        }
-
-        internal void HandleError(ThrownError error)
-        {
-            if (processId == error.ProcessId &&
-                instanceId == error.InstanceId)
-            callbacks?.Invoke(this, attachedContext);
+            var eventContext = new EventContext<ErrorEvent>(this, context);
+            Source.Attach(eventContext);
+            return Task.FromResult<IEventContext>(eventContext);
         }
 
         public void Dispose()
         {
-            Source.Detach(this);
-            attachedContext = null;
             callbacks = null;
         }
     }

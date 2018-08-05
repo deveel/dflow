@@ -41,5 +41,10 @@ namespace Deveel.Workflows
         {
             return new ExecutionContext(this, node);
         }
+
+        public void Dispose()
+        {
+            scope?.Dispose();
+        }
     }
 }

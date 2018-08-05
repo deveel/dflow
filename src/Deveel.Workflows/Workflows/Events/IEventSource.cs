@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
@@ -6,6 +7,8 @@ namespace Deveel.Workflows.Events
     {
         EventType EventType { get; }
 
-        void Attach(IEvent @event);
+        Task AttachAsync(IEventContext context);
+
+        Task DetachAsync(IEventContext context);
     }
 }

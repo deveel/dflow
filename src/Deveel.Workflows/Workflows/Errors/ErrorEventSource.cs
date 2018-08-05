@@ -9,53 +9,62 @@ namespace Deveel.Workflows.Errors
     public sealed class ErrorEventSource : IEventSource
     {
         private IErrorSignal errorSignal;
-        private Dictionary<string, ErrorEvent> events;
-        private Dictionary<string, Task> waiters;
+        private Dictionary<EventId, IEventContext> events;
+        private Dictionary<EventId, Task> waiters;
         private CancellationTokenSource tokenSource;
 
         public ErrorEventSource(IErrorSignal errorSignal)
         {
             this.errorSignal = errorSignal;
-            events = new Dictionary<string, ErrorEvent>();
-            waiters = new Dictionary<string, Task>();
+            events = new Dictionary<EventId, IEventContext>();
+            waiters = new Dictionary<EventId, Task>();
             tokenSource = new CancellationTokenSource();
         }
 
         public EventType EventType => EventType.Error;
 
-        void IEventSource.Attach(IEvent @event)
+        Task IEventSource.AttachAsync(IEventContext context)
         {
-            Attach((ErrorEvent)@event);
+            Attach((EventContext<ErrorEvent>)context);
+            return Task.CompletedTask;
         }
 
-        public void Attach(ErrorEvent @event)
+        internal void Attach(EventContext<ErrorEvent> context)
         {
-            if (!events.ContainsKey(@event.Name))
+            if (!events.ContainsKey(context.EventId))
             {
-                waiters[@event.Name] = Task.Run(() => WaitForErrorAsync(@event.Name), tokenSource.Token);
-                events.Add(@event.Name, @event);
+                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.Event.Name), tokenSource.Token);
+                events.Add(context.EventId, context);
             }
         }
 
-        internal void Detach(ErrorEvent @event)
+        Task IEventSource.DetachAsync(IEventContext context)
         {
-            if (events.ContainsKey(@event.Name))
+            Detach((EventContext<ErrorEvent>) context);
+            return Task.CompletedTask;
+        }
+
+        private void Detach(EventContext<ErrorEvent> context)
+        {
+            var id = context.EventId;
+
+            if (events.ContainsKey(id))
             {
-                var task = waiters[@event.Name];
+                var task = waiters[id];
                 task.Dispose();
 
-                waiters.Remove(@event.Name);
-                events.Remove(@event.Name);
+                waiters.Remove(id);
+                events.Remove(id);
             }
         }
 
-        private async Task WaitForErrorAsync(string errorName)
+        private async Task WaitForErrorAsync(EventId eventId, string errorName)
         {
-            var error = await errorSignal.WaitForErrorAsync(errorName, tokenSource.Token);
+            var error = await errorSignal.WaitForErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, tokenSource.Token);
 
-            if (error != null && events.TryGetValue(error.Name, out ErrorEvent errorEvent))
+            if (error != null && events.TryGetValue(eventId, out IEventContext errorEvent))
             {
-                errorEvent.HandleError(error);
+                await errorEvent.FireAsync();
             }
         }
 

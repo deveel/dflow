@@ -24,7 +24,7 @@ namespace Deveel.Workflows
 
             foreach (var boundaryEvent in BoundaryEvents)
             {
-                boundaryEvent.Init(scope);
+                boundaryEvent.InitAsync(scope).Wait();
             }
 
             return scope;

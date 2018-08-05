@@ -12,8 +12,8 @@ namespace Deveel.Workflows
 
         protected TaskTestsBase(string processId)
         {
-            Process = CreateProcess(processId);
             Context = CreateContext();
+            Process = CreateProcess(processId);
         }
 
         protected Process Process { get; }

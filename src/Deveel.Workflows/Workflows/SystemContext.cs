@@ -4,7 +4,7 @@ namespace Deveel.Workflows
 {
     public sealed class SystemContext : IContext
     {
-        private readonly IServiceProvider provider;
+        private IServiceProvider provider;
 
         public SystemContext(IServiceProvider provider)
         {
@@ -12,6 +12,11 @@ namespace Deveel.Workflows
         }
 
         IContext IContext.Parent => null;
+
+        public void Dispose()
+        {
+            provider = null;
+        }
 
         object IServiceProvider.GetService(Type serviceType)
         {

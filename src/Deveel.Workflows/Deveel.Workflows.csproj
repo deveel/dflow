@@ -13,6 +13,11 @@
 
   <ItemGroup>
     <Compile Remove="Workflows\State.cs" />
+    <Compile Remove="Workflows\Timers\TimerInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Workflows\Timers\TimerEvent.cs.bak" />
   </ItemGroup>
 
   <ItemGroup>

@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.Events;
+using Deveel.Workflows.Timers;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
 namespace Deveel.Workflows
@@ -10,16 +12,27 @@ namespace Deveel.Workflows
     {
         private bool timeout;
 
+        protected override void AddServices(IServiceCollection services)
+        {
+            services.AddQuartzScheduler();
+        }
+
         protected override void OnTaskAdd(ProcessSequence sequence)
         {
-           sequence.Add(new ServiceTask("waitTask", context => Thread.Sleep(2000))
-           {
-               BoundaryEvents =
+            var scheduler = Context.GetRequiredService<IJobScheduler>();
+            var source = new TimerEventSource(scheduler);
+
+            sequence.Add(new ServiceTask("waitTask", context => Thread.Sleep(2000))
+            {
+                BoundaryEvents =
                {
-                   new BoundaryEvent(new TimerEvent("timer1", new TimerInfo(TimeSpan.FromMilliseconds(200))), 
-                       new ServiceTask("timeoutTask", context => timeout = true))
+                   new BoundaryEvent(new TimerEvent(source, "timer1", new ScheduleInfo
+                   {
+
+                       Duration = TimeSpan.FromMilliseconds(200)
+                   }), new ServiceTask("timeoutTask", context => timeout = true))
                }
-           });
+            });
         }
 
         [Fact]

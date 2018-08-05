@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
@@ -17,16 +18,9 @@ namespace Deveel.Workflows.Events
 
         IEventSource IEvent.Source => new NoneEventSource();
 
-        void IEvent.AttachToContext(ExecutionContext context)
+        Task<IEventContext> IEvent.CreateContextAsync(ExecutionContext context)
         {
-        }
-
-        void IEvent.Attach(Action<IEvent, ExecutionContext> callback)
-        {
-        }
-
-        void IEvent.Detach(Action<IEvent, ExecutionContext> callback)
-        {
+            return Task.FromResult<IEventContext>(new EventContext<NoneEvent>(this, context));
         }
 
         #region NoneEventSource
@@ -35,8 +29,14 @@ namespace Deveel.Workflows.Events
         {
             public EventType EventType => EventType.None;
 
-            public void Attach(IEvent @event)
+            public Task AttachAsync(IEventContext context)
             {
+                return Task.CompletedTask;
+            }
+
+            public Task DetachAsync(IEventContext context)
+            {
+                return Task.CompletedTask;
             }
 
             public void Dispose()
