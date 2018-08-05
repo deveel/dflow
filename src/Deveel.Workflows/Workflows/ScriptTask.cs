@@ -42,14 +42,10 @@ namespace Deveel.Workflows
             var variables = await registry.GetVariablesAsync(context.CancellationToken);
             var executor = (IScriptingExecutor) state;
 
-            var globals = new ScriptGlobals(context, variables.ToDictionary(x => x.Name, x => x.Value));
+            var globals = context.CreateScript();
 
             var result = executor.ExecuteAsync(globals);
 
-            if (globals.VariablesSet)
-            {
-                //TODO:
-            }
 
             // TODO: set the result in scope
         }

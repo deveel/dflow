@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
 using Deveel.Workflows.Errors;
 using Deveel.Workflows.Events;
+using Deveel.Workflows.Scripts;
 using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
@@ -111,6 +112,11 @@ namespace Deveel.Workflows
         public ExecutionContext CreateScope(FlowNode node)
         {
             return new ExecutionContext(this, node);
+        }
+
+        public ScriptContext CreateScript()
+        {
+            return new ScriptContext(this);
         }
 
         public async Task<ExecutionState> GetStateAsync()

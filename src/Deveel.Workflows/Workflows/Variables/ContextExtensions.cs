@@ -6,6 +6,29 @@ namespace Deveel.Workflows.Variables
 {
     public static class ContextExtensions
     {
+        public static bool TryGetVariable(this IContext context, string name, out Variable variable)
+        {
+            var current = context;
+            while (current != null)
+            {
+                if (current is IVariableContext)
+                {
+                    var variables = ((IVariableContext)current).Variables;
+                    if (variables.TryGetVariableAsync(name, out Variable v, context.CancellationToken).Result)
+                    {
+                        variable = v;
+                        return true;
+                    }
+                }
+
+                current = current.Parent;
+            }
+
+            // TODO: throw a Null-Reference Exception?
+            variable = null;
+            return false;
+        }
+
         public static async Task<object> FindVariableAsync(this IContext context, string name)
         {
             var current = context;

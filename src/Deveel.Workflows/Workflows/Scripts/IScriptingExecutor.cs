@@ -6,6 +6,6 @@ namespace Deveel.Workflows.Scripts
     {
         string Format { get; }
 
-        Task<ScriptResult> ExecuteAsync(ScriptGlobals globals);
+        Task<ScriptResult> ExecuteAsync(ScriptContext globals);
     }
 }
