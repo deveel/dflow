@@ -2,13 +2,19 @@
 using Microsoft.Extensions.DependencyInjection;
 using Deveel.Workflows.Errors;
 using Xunit;
+using System.Threading;
 
 namespace Deveel.Workflows
 {
     public class ErrorBoundaryEventsTests : TaskTestsBase
     {
         private InMemoryErrorSignal errorSignal;
-        private bool errorCatched;
+        private AutoResetEvent catchEvent;
+
+        public ErrorBoundaryEventsTests()
+        {
+            catchEvent = new AutoResetEvent(false);
+        }
 
         protected override void AddServices(IServiceCollection services)
         {
@@ -26,7 +32,7 @@ namespace Deveel.Workflows
             sequence.Add(new ServiceTask("task1", c => throw new ErrorException("err"))
             {
                 BoundaryEvents = {
-                    new BoundaryEvent(errorEvent, new ServiceTask("catch", c => errorCatched = true))
+                    new BoundaryEvent(errorEvent, new ServiceTask("catch", c => catchEvent.Set()))
                 }
             });
         }
@@ -36,7 +42,7 @@ namespace Deveel.Workflows
         {
             await Process.RunAsync(Context);
 
-            Assert.True(errorCatched);
+            catchEvent.WaitOne();
         }
     }
 }

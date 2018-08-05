@@ -14,7 +14,7 @@ namespace Deveel.Workflows
 
         protected override void AddServices(IServiceCollection services)
         {
-            services.AddQuartzScheduler();
+            services.AddHangfireScheduler();
         }
 
         protected override void OnTaskAdd(ProcessSequence sequence)

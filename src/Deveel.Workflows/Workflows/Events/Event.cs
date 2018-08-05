@@ -17,16 +17,14 @@ namespace Deveel.Workflows.Events
 
         public EventSource EventSource { get; }
 
-        protected virtual EventContext CreateContext(ExecutionContext context)
+        protected virtual EventContext OnCreateContext(ExecutionContext context)
         {
             return new EventContext(this, context);
         }
 
-        internal virtual async Task<EventContext> CreateContextAsync(ExecutionContext context)
+        internal virtual EventContext CreateContext(ExecutionContext context)
         {
-            var eventContext = CreateContext(context);
-            await EventSource.AttachAsync(eventContext);
-            return eventContext;
+            return OnCreateContext(context);
         }
     }
 }

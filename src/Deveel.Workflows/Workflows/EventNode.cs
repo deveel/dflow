@@ -18,7 +18,7 @@ namespace Deveel.Workflows
 
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            var eventContext = await @event.CreateContextAsync(context);
+            var eventContext = @event.CreateContext(context);
             eventContext.Attach(async (e, c, s) => await ReactAsync(e, state, c));
         }
 

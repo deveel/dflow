@@ -1,0 +1,7 @@
+{
+  "profiles": {
+    "Deveel.Workflows.Tests": {
+      "commandName": "Project"
+    }
+  }
+}

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveel.Workflows.Scripting.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveel.Workflows.BusinessRules.NRules", "src\Deveel.Workflows.BusinessRules.NRules\Deveel.Workflows.BusinessRules.NRules.csproj", "{55E5A92B-4675-4819-AD77-16B8F552486B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deveel.Workflows.Timers.Quartz", "src\Deveel.Workflows.Timers.Quartz\Deveel.Workflows.Timers.Quartz.csproj", "{D4EA0D9E-FC93-4950-B6F6-578EC4BCF780}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Deveel.Workflows.Timers.Quartz", "src\Deveel.Workflows.Timers.Quartz\Deveel.Workflows.Timers.Quartz.csproj", "{D4EA0D9E-FC93-4950-B6F6-578EC4BCF780}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Deveel.Workflows.Times.Hangfire", "src\Deveel.Workflows.Times.Hangfire\Deveel.Workflows.Times.Hangfire.csproj", "{3ECA9F35-91F9-4124-9E6E-6A668DF3186B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{D4EA0D9E-FC93-4950-B6F6-578EC4BCF780}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4EA0D9E-FC93-4950-B6F6-578EC4BCF780}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4EA0D9E-FC93-4950-B6F6-578EC4BCF780}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3ECA9F35-91F9-4124-9E6E-6A668DF3186B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ECA9F35-91F9-4124-9E6E-6A668DF3186B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ECA9F35-91F9-4124-9E6E-6A668DF3186B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ECA9F35-91F9-4124-9E6E-6A668DF3186B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

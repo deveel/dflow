@@ -16,7 +16,7 @@ namespace Deveel.Workflows
 
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            using (var eventContext = await Event.CreateContextAsync(context))
+            using (var eventContext = Event.CreateContext(context))
             {
                 var message = eventContext.Wait(context.CancellationToken);
 

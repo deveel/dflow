@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.Actors;
@@ -15,6 +16,8 @@ namespace Deveel.Workflows
     {
         private readonly CancellationTokenSource tokenSource;
         private IServiceScope scope;
+
+        private List<BoundaryEvent> events;
 
         public ExecutionContext(IContext parent, FlowNode node)
         {
@@ -49,6 +52,14 @@ namespace Deveel.Workflows
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
         public CancellationToken CancellationToken { get; }
+
+        internal void AddEvent(BoundaryEvent boundaryEvent)
+        {
+            if (events == null)
+                events = new List<BoundaryEvent>();
+
+            events.Add(boundaryEvent);
+        }
 
         private ProcessContext FindProcess()
         {
@@ -93,8 +104,16 @@ namespace Deveel.Workflows
         internal void Complete()
             => ChangeStatus(ExecutionStatus.Completed);
 
-        internal void Start()
-            => ChangeStatus(ExecutionStatus.Executing);
+        internal async Task StartAsync()
+        {
+            ChangeStatus(ExecutionStatus.Executing);
+
+            if (events != null)
+            {
+                foreach (var e in events)
+                    await e.BeginAsync();
+            }
+        }
 
         internal void Cancel()
         {

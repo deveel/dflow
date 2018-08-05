@@ -21,12 +21,12 @@ namespace Deveel.Workflows.Timers
             var timer = (TimerEvent)context.Event;
             var scheduleInfo = timer.ScheduleInfo;
 
-            return scheduler.ScheduleAsync(context.EventId, scheduleInfo, new ScheduleCallback(context));
+            return scheduler.ScheduleAsync(context.EventId.ToString(), scheduleInfo, new ScheduleCallback(context), context.CancellationToken);
         }
 
         protected override Task DetachContextAsync(EventContext context)
         {
-            return scheduler.UnscheduleAsync(context.EventId);
+            return scheduler.UnscheduleAsync(context.EventId.ToString(), context.CancellationToken);
         }
 
         #region ScheduleCallback

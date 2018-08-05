@@ -10,16 +10,19 @@
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <DebugType>Full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Deveel.Workflows.BusinessRules.NRules\Deveel.Workflows.BusinessRules.NRules.csproj" />
     <ProjectReference Include="..\..\src\Deveel.Workflows.Scripting.CSharp\Deveel.Workflows.Scripting.CSharp.csproj" />
-    <ProjectReference Include="..\..\src\Deveel.Workflows.Timers.Quartz\Deveel.Workflows.Timers.Quartz.csproj" />
+    <ProjectReference Include="..\..\src\Deveel.Workflows.Times.Hangfire\Deveel.Workflows.Times.Hangfire.csproj" />
     <ProjectReference Include="..\..\src\Deveel.Workflows\Deveel.Workflows.csproj" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.CodeCoverage" Version="15.8.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.8.0" />
     <PackageReference Include="Moq" Version="4.9.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />

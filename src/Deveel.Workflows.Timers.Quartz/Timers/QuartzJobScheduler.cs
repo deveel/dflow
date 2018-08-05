@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class QuartzJobScheduler : IJobScheduler
+    public sealed class QuartzJobScheduler : IJobScheduler, IDisposable
     {
         private IScheduler scheduler;
 
@@ -19,18 +19,18 @@ namespace Deveel.Workflows.Timers
 
         public void Dispose()
         {
+            scheduler.Clear();
             scheduler.Shutdown().Wait();
         }
 
-        public async Task ScheduleAsync(EventId eventId, ScheduleInfo scheduleInfo, IScheduleCallback callback)
+        public async Task ScheduleAsync(string jobId, ScheduleInfo scheduleInfo, IScheduleCallback callback, CancellationToken cancellationToken)
         {
-            var group = $"{eventId.ProcessId}({eventId.InstanceKey})";
             var jobDetail = JobBuilder.Create<ScheduledJob>()
-                .WithIdentity(eventId.EventName, group)
+                .WithIdentity(jobId)
                 .Build();
 
             var triggerBuilder = TriggerBuilder.Create()
-                .ForJob(eventId.EventName, group)
+                .ForJob(jobId)
                 .StartNow();
 
             if (String.IsNullOrWhiteSpace(scheduleInfo.CronExpression))
@@ -50,22 +50,21 @@ namespace Deveel.Workflows.Timers
 
             var trigger = triggerBuilder.Build();
 
-            var listenerName = $"listen({eventId.EventName}({group}))";
+            var listenerName = $"listen({jobId})";
             scheduler.ListenerManager
                 .AddJobListener(new JobListener(listenerName, callback),
-                KeyMatcher<JobKey>.KeyEquals(new JobKey(eventId.EventName, group)));
+                KeyMatcher<JobKey>.KeyEquals(new JobKey(jobId)));
 
-            await scheduler.ScheduleJob(jobDetail, trigger);
+            await scheduler.ScheduleJob(jobDetail, trigger, cancellationToken);
         }
 
-        public async Task UnscheduleAsync(EventId eventId)
+        public async Task UnscheduleAsync(string jobId, CancellationToken cancellationToken)
         {
-            var group = $"{eventId.ProcessId}({eventId.InstanceKey})";
-            var listenerName = $"listen({eventId.EventName}({group}))";
+            var listenerName = $"listen({jobId})";
 
             scheduler.ListenerManager.RemoveJobListener(listenerName);
 
-            await scheduler.DeleteJob(new JobKey(eventId.EventName, group));
+            await scheduler.DeleteJob(new JobKey(jobId));
         }
 
         #region JobListener

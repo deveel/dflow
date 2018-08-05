@@ -24,9 +24,9 @@ namespace Deveel.Workflows
 
         public EventType EventType => source.EventSource.EventType;
 
-        internal async Task InitAsync(ExecutionContext context)
+        internal void Init(ExecutionContext context)
         {
-            eventContext = await source.CreateContextAsync(context);
+            eventContext = source.CreateContext(context);
             eventContext.Attach(callback);
         }
 
@@ -34,6 +34,11 @@ namespace Deveel.Workflows
         {
             attachedActivity = activity;
             callback = async (e,c, s) => await ReactAsync(e, c, s);
+        }
+
+        internal Task BeginAsync()
+        {
+            return eventContext.BeginAsync();
         }
 
         internal void DetachFrom(Activity activity)

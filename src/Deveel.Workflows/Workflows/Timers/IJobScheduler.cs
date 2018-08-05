@@ -1,14 +1,14 @@
 ﻿using Deveel.Workflows.Events;
 using System;
-
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Timers
 {
     public interface IJobScheduler : IDisposable
     {
-        Task ScheduleAsync(EventId eventId, ScheduleInfo scheduleInfo, IScheduleCallback callback);
+        Task ScheduleAsync(string jobId, ScheduleInfo scheduleInfo, IScheduleCallback callback, CancellationToken cancellationToken);
 
-        Task UnscheduleAsync(EventId eventId);
+        Task UnscheduleAsync(string jobId, CancellationToken cancellationToken);
     }
 }

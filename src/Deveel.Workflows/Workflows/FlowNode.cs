@@ -36,11 +36,13 @@ namespace Deveel.Workflows
                 throw new ArgumentNullException(nameof(context));
 
             var scope = CreateScope(context);
-            scope.Start();
 
             try
             {
                 var state = await CreateStateAsync(context);
+
+                await scope.StartAsync();
+
                 await ExecuteNodeAsync(state, scope);
 
                 scope.Complete();

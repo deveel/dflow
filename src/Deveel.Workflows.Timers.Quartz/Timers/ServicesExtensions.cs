@@ -7,15 +7,14 @@ namespace Deveel.Workflows.Timers
 {
     public static class ServicesExtensions
     {
-        public static void AddQuartzScheduler(this IServiceCollection services)
-        {
-            services.AddSingleton<ISchedulerFactory>(p => new StdSchedulerFactory());
 
-            services.AddSingleton<IJobScheduler, QuartzJobScheduler>(p =>
+        public static IServiceCollection AddQuartzScheduler(this IServiceCollection services)
+        {
+            return services.AddSingleton<IJobScheduler, QuartzJobScheduler>(p =>
             {
-                var factory = p.GetRequiredService<ISchedulerFactory>();
-                var scheduler = factory.GetScheduler().Result;
-                return new QuartzJobScheduler(scheduler);
+                QuartzNetScheduler.Initialize(new QuartzOptions());
+
+                return new QuartzJobScheduler(QuartzNetScheduler.Scheduler);
             });
         }
     }

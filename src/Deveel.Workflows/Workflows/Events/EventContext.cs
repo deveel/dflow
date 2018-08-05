@@ -67,6 +67,11 @@ namespace Deveel.Workflows.Events
             return scope.ServiceProvider.GetService(serviceType);
         }
 
+        internal Task BeginAsync()
+        {
+            return Event.EventSource.AttachAsync(this);
+        }
+
         internal async Task FireAsync(object state)
         {
             await OnFired(state);
