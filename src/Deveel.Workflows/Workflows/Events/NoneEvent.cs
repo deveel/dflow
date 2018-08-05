@@ -1,53 +1,25 @@
 ﻿using System;
-using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
-    public sealed class NoneEvent : IEvent
+    public sealed class NoneEvent : Event
     {
         public NoneEvent() : this("none")
         {
         }
 
         public NoneEvent(string name)
+            : base(new NoneEventSource(), name)
         {
-            Name = name;
-        }
-
-        public string Name { get; }
-
-        IEventSource IEvent.Source => new NoneEventSource();
-
-        Task<IEventContext> IEvent.CreateContextAsync(ExecutionContext context)
-        {
-            return Task.FromResult<IEventContext>(new EventContext<NoneEvent>(this, context));
         }
 
         #region NoneEventSource
 
-        class NoneEventSource : IEventSource
+        class NoneEventSource : EventSource
         {
-            public EventType EventType => EventType.None;
-
-            public Task AttachAsync(IEventContext context)
-            {
-                return Task.CompletedTask;
-            }
-
-            public Task DetachAsync(IEventContext context)
-            {
-                return Task.CompletedTask;
-            }
-
-            public void Dispose()
-            {
-            }
+            public override EventType EventType => EventType.None;
         }
 
         #endregion
-
-        public void Dispose()
-        {
-        }
     }
 }

@@ -14,8 +14,6 @@ namespace Deveel.Workflows.Scripts
 
         public ExecutionContext Context { get; }
 
-        public IActor Actor => Context.Actor;
-
         internal IDictionary<string, object> Variables { get; }
 
         internal bool VariablesSet { get; private set; }

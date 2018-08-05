@@ -6,45 +6,33 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Errors
 {
-    public sealed class ErrorEventSource : IEventSource
+    public sealed class ErrorEventSource : EventSource
     {
         private IErrorSignal errorSignal;
-        private Dictionary<EventId, IEventContext> events;
+        private Dictionary<EventId, EventContext> events;
         private Dictionary<EventId, Task> waiters;
-        private CancellationTokenSource tokenSource;
 
         public ErrorEventSource(IErrorSignal errorSignal)
         {
             this.errorSignal = errorSignal;
-            events = new Dictionary<EventId, IEventContext>();
+            events = new Dictionary<EventId, EventContext>();
             waiters = new Dictionary<EventId, Task>();
-            tokenSource = new CancellationTokenSource();
         }
 
-        public EventType EventType => EventType.Error;
+        public override EventType EventType => EventType.Error;
 
-        Task IEventSource.AttachAsync(IEventContext context)
-        {
-            Attach((EventContext<ErrorEvent>)context);
-            return Task.CompletedTask;
-        }
-
-        internal void Attach(EventContext<ErrorEvent> context)
+        protected override Task AttachContextAsync(EventContext context)
         {
             if (!events.ContainsKey(context.EventId))
             {
-                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.Event.Name), tokenSource.Token);
+                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.Event.Name, context.CancellationToken));
                 events.Add(context.EventId, context);
             }
-        }
 
-        Task IEventSource.DetachAsync(IEventContext context)
-        {
-            Detach((EventContext<ErrorEvent>) context);
             return Task.CompletedTask;
         }
 
-        private void Detach(EventContext<ErrorEvent> context)
+        protected override Task DetachContextAsync(EventContext context)
         {
             var id = context.EventId;
 
@@ -56,29 +44,40 @@ namespace Deveel.Workflows.Errors
                 waiters.Remove(id);
                 events.Remove(id);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task WaitForErrorAsync(EventId eventId, string errorName)
+        private async Task WaitForErrorAsync(EventId eventId, string errorName, CancellationToken cancellationToken)
         {
-            var error = await errorSignal.WaitForErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, tokenSource.Token);
+            var error = await errorSignal.WaitForErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, cancellationToken);
 
-            if (error != null && events.TryGetValue(eventId, out IEventContext errorEvent))
+            if (error != null && events.TryGetValue(eventId, out EventContext errorEvent))
             {
-                await errorEvent.FireAsync();
+                await errorEvent.FireAsync(error);
             }
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            tokenSource.Cancel();
-            
-            foreach(var e in events.Values)
+            if (disposing)
             {
-                e.Dispose();
+                foreach (var waiter in waiters.Values)
+                {
+                    waiter.Wait(200);
+                    waiter.Dispose();
+                }
+
+                foreach (var e in events.Values)
+                {
+                    e.Dispose();
+                }
+
+                events.Clear();
             }
 
-            events.Clear();
             errorSignal = null;
+            base.Dispose(disposing);
         }
     }
 }

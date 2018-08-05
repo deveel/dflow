@@ -41,5 +41,10 @@ namespace Deveel.Workflows.Events
             hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(EventName);
             return hashCode;
         }
+
+        public override string ToString()
+        {
+            return $"{ProcessId}({InstanceKey}).{EventName}";
+        }
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class TimerEventSource : IEventSource
+    public sealed class TimerEventSource : EventSource
     {
         private IJobScheduler scheduler;
 
@@ -14,39 +14,35 @@ namespace Deveel.Workflows.Timers
             this.scheduler = scheduler;
         }
 
-        public EventType EventType => EventType.Timer;
+        public override EventType EventType => EventType.Timer;
 
-        async Task IEventSource.AttachAsync(IEventContext context)
+        protected override Task AttachContextAsync(EventContext context)
         {
             var timer = (TimerEvent)context.Event;
             var scheduleInfo = timer.ScheduleInfo;
 
-            await scheduler.ScheduleAsync(context.EventId, scheduleInfo, new ScheduleCallback(context));
+            return scheduler.ScheduleAsync(context.EventId, scheduleInfo, new ScheduleCallback(context));
         }
 
-        async Task IEventSource.DetachAsync(IEventContext context)
+        protected override Task DetachContextAsync(EventContext context)
         {
-            await scheduler.UnscheduleAsync(context.EventId);
-        }
-
-        public void Dispose()
-        {
+            return scheduler.UnscheduleAsync(context.EventId);
         }
 
         #region ScheduleCallback
 
         class ScheduleCallback : IScheduleCallback
         {
-            private readonly IEventContext context;
+            private readonly EventContext context;
 
-            public ScheduleCallback(IEventContext context)
+            public ScheduleCallback(EventContext context)
             {
                 this.context = context;
             }
 
             public Task NotifyAsync()
             {
-                return context.FireAsync();
+                return context.FireAsync(null);
             }
         }
 

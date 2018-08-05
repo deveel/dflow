@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Deveel.Workflows.Actors;
+using Deveel.Workflows.Events;
+using System;
+using System.Threading;
 
 namespace Deveel.Workflows
 {
@@ -13,6 +16,8 @@ namespace Deveel.Workflows
 
         IContext IContext.Parent => null;
 
+        CancellationToken IContext.CancellationToken => CancellationToken.None;
+
         public void Dispose()
         {
             provider = null;
@@ -22,5 +27,22 @@ namespace Deveel.Workflows
         {
             return provider.GetService(serviceType);
         }
+
+        public ProcessContext CreateContext(Process process, IActor actor, Event trigger, string instanceId)
+        {
+            return new ProcessContext(this, process, actor, trigger, instanceId);
+        }
+
+        public ProcessContext CreateContext(Process process, IActor actor, string instanceId)
+            => CreateContext(process, actor, new NoneEvent(), instanceId);
+
+        public ProcessContext CreateContext(Process process, Event trigger, string instanceId)
+            => CreateContext(process, new SystemUser(), trigger, instanceId);
+
+        public ProcessContext CreateContext(Process process, string instanceId)
+            => CreateContext(process, new SystemUser(), new NoneEvent(), instanceId);
+
+        public ProcessContext CreateContext(Process process)
+            => CreateContext(process, Guid.NewGuid().ToString());
     }
 }

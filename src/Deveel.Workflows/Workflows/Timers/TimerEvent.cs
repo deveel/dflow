@@ -4,31 +4,13 @@ using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class TimerEvent : IEvent
+    public sealed class TimerEvent : Event
     {
-        private TimerEventSource eventSource;
-
-        public TimerEvent(TimerEventSource eventSource, string name, ScheduleInfo scheduleInfo) {
-            Name = name;
-            this.eventSource = eventSource;
+        public TimerEvent(TimerEventSource eventSource, string name, ScheduleInfo scheduleInfo)
+            : base(eventSource, name) {
             ScheduleInfo = scheduleInfo;
         }
 
-        public string Name { get; }
-
         public ScheduleInfo ScheduleInfo { get; }
-
-        IEventSource IEvent.Source => eventSource;
-
-        public async Task<IEventContext> CreateContextAsync(ExecutionContext context)
-        {
-            var eventContext = new EventContext<TimerEvent>(this, context);
-            await ((IEventSource)eventSource).AttachAsync(eventContext);
-            return eventContext;
-        }
-
-        public void Dispose()
-        {
-        }
     }
 }

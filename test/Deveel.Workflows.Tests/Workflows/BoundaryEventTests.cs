@@ -19,7 +19,7 @@ namespace Deveel.Workflows
 
         protected override void OnTaskAdd(ProcessSequence sequence)
         {
-            var scheduler = Context.GetRequiredService<IJobScheduler>();
+            var scheduler = SystemContext.GetRequiredService<IJobScheduler>();
             var source = new TimerEventSource(scheduler);
 
             sequence.Add(new ServiceTask("waitTask", context => Thread.Sleep(2000))

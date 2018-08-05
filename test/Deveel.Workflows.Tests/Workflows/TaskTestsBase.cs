@@ -1,4 +1,6 @@
 ﻿using System;
+using Deveel.Workflows.Actors;
+using Deveel.Workflows.Events;
 using Deveel.Workflows.States;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -6,29 +8,32 @@ namespace Deveel.Workflows
 {
     public abstract class TaskTestsBase
     {
-        protected TaskTestsBase() : this(Guid.NewGuid().ToString())
+        protected TaskTestsBase() : this("testProcess")
         {
         }
 
         protected TaskTestsBase(string processId)
         {
-            Context = CreateContext();
+            SystemContext = CreateSystemContext();
             Process = CreateProcess(processId);
+            Context = CreateContext(Process);
         }
 
         protected Process Process { get; }
 
-        protected SystemContext Context { get; }
+        protected ProcessContext Context { get; }
+
+        protected SystemContext SystemContext { get; }
 
         private Process CreateProcess(string processId)
         {
-            var process = new Process(processId);
+            var process = new Process(new ProcessInfo(processId));
             OnTaskAdd(process.Sequence);
 
             return process;
         }
 
-        private SystemContext CreateContext()
+        private SystemContext CreateSystemContext()
         {
             var services = new ServiceCollection();
 
@@ -38,6 +43,11 @@ namespace Deveel.Workflows
 
             var provider = services.BuildServiceProvider();
             return new SystemContext(provider);
+        }
+
+        private ProcessContext CreateContext(Process process)
+        {
+            return SystemContext.CreateContext(process, new SystemUser(), new NoneEvent(), Guid.NewGuid().ToString());
         }
 
         protected virtual void AddServices(IServiceCollection services)

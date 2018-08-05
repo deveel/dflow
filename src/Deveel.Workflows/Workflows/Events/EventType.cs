@@ -7,6 +7,7 @@ namespace Deveel.Workflows.Events
         None,
         Timer,
         Message,
+        Signal,
         Error
     }
 }

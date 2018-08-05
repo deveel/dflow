@@ -10,31 +10,30 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
 {
-    public sealed class ExecutionContext : IContext
+    public sealed class ExecutionContext : IContext, IVariableContext
     {
         private readonly CancellationTokenSource tokenSource;
+        private IServiceScope scope;
 
         public ExecutionContext(IContext parent, FlowNode node)
         {
             Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            Provider = parent.CreateScope();
+            scope = parent.CreateScope();
             Node = node;
 
             tokenSource = new CancellationTokenSource();
             CancellationToken = tokenSource.Token;
 
             Process = FindProcess();
+
+            Variables = new InMemoryVariableRegistry();
         }
 
         public IContext Parent { get; }
 
-        private IServiceScope Provider { get; }
-
         public ProcessContext Process { get; }
 
         public FlowNode Node { get; }
-
-        public IActor Actor { get; }
 
         public Exception Error { get; private set; }
 
@@ -43,6 +42,8 @@ namespace Deveel.Workflows
         public DateTimeOffset? StartedAt { get; private set; }
 
         public DateTimeOffset? FinishedAt { get; private set; }
+
+        public IVariableRegistry Variables { get; }
 
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
@@ -134,12 +135,12 @@ namespace Deveel.Workflows
 
         object IServiceProvider.GetService(Type serviceType)
         {
-            return Provider == null ? null : Provider.ServiceProvider.GetService(serviceType);
+            return scope == null ? null : scope.ServiceProvider.GetService(serviceType);
         }
 
         public void Dispose()
         {
-            Provider?.Dispose();
+            scope?.Dispose();
         }
     }
 }

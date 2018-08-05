@@ -4,11 +4,11 @@ using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows
 {
-    public class Event : FlowNode
+    public class EventNode : FlowNode
     {
-        private readonly IEvent @event;
+        private readonly Event @event;
 
-        public Event(string id, IEvent @event)
+        public EventNode(string id, Event @event)
         : base(id)
         {
             this.@event = @event;
@@ -19,10 +19,10 @@ namespace Deveel.Workflows
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var eventContext = await @event.CreateContextAsync(context);
-            eventContext.Attach(async (e, c) => await ReactAsync(e, state, c));
+            eventContext.Attach(async (e, c, s) => await ReactAsync(e, state, c));
         }
 
-        protected virtual Task ReactAsync(IEvent source, object state, ExecutionContext context)
+        protected virtual Task ReactAsync(Event source, object state, ExecutionContext context)
         {
             return Task.CompletedTask;
         }

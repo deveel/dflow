@@ -16,7 +16,7 @@ namespace Deveel.Workflows
         [Fact]
         public async Task SingleActivityFlow()
         {
-            var workflow = new Process("test1");
+            var workflow = new Process(new ProcessInfo("test1"));
             workflow.Sequence.Add(new ServiceTask("task1", c => {}));
 
             var services = new ServiceCollection();
@@ -25,7 +25,7 @@ namespace Deveel.Workflows
             var provider = services.BuildServiceProvider();
             var system = new SystemContext(provider);
 
-            await workflow.RunAsync(system);
+            await workflow.RunAsync(system.CreateContext(workflow));
         }
 
         [Fact]
@@ -39,14 +39,14 @@ namespace Deveel.Workflows
             var system = new SystemContext(provider);
 
             var processId = "proc1";
-            var process = new Process(processId);
+            var process = new Process(new ProcessInfo(processId));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new ForkGateway("fork")
             {
                 Flows =
                 {
-                    new SimpleGatewayFlow(new ServiceTask("addOne", async c => await c.SetVariableAsync("one", 2))),
-                    new SimpleGatewayFlow(new ServiceTask("addTwo", async c => await c.SetVariableAsync("two", 3)))
+                    new SimpleGatewayFlow(new ServiceTask("addOne", async c => await c.SetProcessVariableAsync("one", 2))),
+                    new SimpleGatewayFlow(new ServiceTask("addTwo", async c => await c.SetProcessVariableAsync("two", 3)))
                 }
             });
             process.Sequence.Add(new JoinGateway("join", async c =>
@@ -54,7 +54,7 @@ namespace Deveel.Workflows
                 var arg1 = (int)(await c.FindVariableAsync("one"));
                 var arg2 = (int) (await c.FindVariableAsync("two"));
 
-                await c.SetVariableAsync("sum", arg1 + arg2);
+                await c.SetProcessVariableAsync("sum", arg1 + arg2);
             })
             {
                 Flows =
@@ -64,9 +64,10 @@ namespace Deveel.Workflows
                 }
             });
 
-            await process.RunAsync(system);
+            var context = system.CreateContext(process);
+            await process.RunAsync(context);
 
-            var sum = await system.FindVariableAsync("sum");
+            var sum = await context.FindVariableAsync("sum");
 
             Assert.NotNull(sum);
             Assert.IsType<int>(sum);
@@ -88,14 +89,15 @@ b = i+1;
             var provider = services.BuildServiceProvider();
             var system = new SystemContext(provider);
 
-            await system.SetVariableAsync("a", 2);
-
             var processId = "proc1";
-            var process = new Process(processId);
+            var process = new Process(new ProcessInfo(processId));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine()));
 
-            await process.RunAsync(system);
+            var context = system.CreateContext(process);
+            await context.SetVariableAsync("a", 2);
+
+            await process.RunAsync(context);
         }
 
         [Fact]
@@ -112,14 +114,15 @@ b = i+1;
             var provider = services.BuildServiceProvider();
             var system = new SystemContext(provider);
 
-            await system.SetVariableAsync("a", 2);
-
             var processId = "proc1";
-            var process = new Process(processId);
+            var process = new Process(new ProcessInfo(processId));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new BusinessRuleTask("bizTask", "bizRule1"));
 
-            await process.RunAsync(system);
+            var context = system.CreateContext(process);
+
+            await context.SetVariableAsync("a", 2);
+            await process.RunAsync(context);
 
         }
 

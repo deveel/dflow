@@ -39,7 +39,7 @@ namespace Deveel.Workflows
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
             var registry = context.GetRequiredService<IVariableRegistry>();
-            var variables = await registry.GetVariablesAsync();
+            var variables = await registry.GetVariablesAsync(context.CancellationToken);
             var executor = (IScriptingExecutor) state;
 
             var globals = new ScriptGlobals(context, variables.ToDictionary(x => x.Name, x => x.Value));

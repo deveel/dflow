@@ -12,7 +12,7 @@ namespace Deveel.Workflows.Model
             var source = new ErrorEventSource(errorSignal);
             var errorEvent = new ErrorEvent(source, Name);
 
-            return new Event(Id, errorEvent);
+            return new EventNode(Id, errorEvent);
         }
     }
 }

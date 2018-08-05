@@ -25,7 +25,7 @@ namespace Deveel.Workflows.Model
             if (String.IsNullOrWhiteSpace(Id))
                 throw new InvalidOperationException();
 
-            var process = new Process(Id);
+            var process = new Process(new ProcessInfo(Id));
 
             foreach (var model in Sequence)
             {

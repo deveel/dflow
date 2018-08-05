@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows.Variables
 {
@@ -10,34 +8,72 @@ namespace Deveel.Workflows.Variables
     {
         public static async Task<object> FindVariableAsync(this IContext context, string name)
         {
-            var registry = context.GetService<IVariableRegistry>();
-            if (registry == null)
-                return null;
+            var current = context;
+            while(current != null)
+            {
+                if (current is IVariableContext)
+                {
+                    var variables = ((IVariableContext)current).Variables;
+                    if (await variables.TryGetVariableAsync(name, out Variable variable, context.CancellationToken))
+                        return variable.Value;
+                }
 
-            var variableObj = await registry.FindVariableAsync(name);
-            if (variableObj == null)
-                return null;
+                current = current.Parent;
+            }
 
-            return variableObj.Value;
+            // TODO: throw a Null-Reference Exception?
+            return null;
         }
 
 
-        public static async Task SetVariableAsync(this IContext context, string name, object value)
+        public static Task SetVariableAsync(this IContext context, string name, object value)
         {
-            var registry = context.GetService<IVariableRegistry>();
-            if (registry == null)
-                throw new InvalidOperationException();
+            var current = context;
+            while (current != null)
+            {
+                if (current is IVariableContext)
+                {
+                    var variables = ((IVariableContext)current).Variables;
+                    return variables.SetVariableAsync(new Variable(name, value), context.CancellationToken);
+                }
 
-            await registry.SetVariableAsync(new Variable(name, value));
+                current = current.Parent;
+            }
+
+            return Task.FromException(new FlowException("It was not possible to find any valid variables context"));
         }
 
-        public static Task<IList<Variable>> GetVariablesAsync(this IContext context)
+        public static Task SetProcessVariableAsync(this IContext context, string name, object value)
         {
-            var registry = context.GetService<IVariableRegistry>();
-            if (registry == null)
-                return Task.FromResult<IList<Variable>>(new List<Variable>());
+            var current = context;
+            while (current != null)
+            {
+                if (current is ProcessContext)
+                {
+                    return ((IVariableContext)current).Variables.SetVariableAsync(new Variable(name, value), context.CancellationToken);
+                }
 
-            return registry.GetVariablesAsync();
+                current = current.Parent;
+            }
+
+            return Task.FromException(new FlowException("This should never happen, but it was not possible to find a process"));
+        }
+
+            public static Task<IList<Variable>> GetVariablesAsync(this IContext context)
+        {
+            var current = context;
+            while (current != null)
+            {
+                if (current is IVariableContext)
+                {
+                    var variables = ((IVariableContext)current).Variables;
+                    return variables.GetVariablesAsync(context.CancellationToken);
+                }
+
+                current = current.Parent;
+            }
+
+            return Task.FromException<IList<Variable>>(new FlowException("It was not possible to find any valid variables context"));
         }
     }
 }
