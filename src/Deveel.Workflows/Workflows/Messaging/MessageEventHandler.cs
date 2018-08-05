@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Deveel.Workflows.Messaging
 {
-    public sealed class MessageEvent : FlowEventHandler
+    public sealed class MessageEventHandler : FlowEventHandler
     {
-        public MessageEvent(MessageEventSource source, string name, IDictionary<string, object> parameters)
+        public MessageEventHandler(MessageEventSource source, string name, IDictionary<string, object> parameters)
             : base(source, name)
         {
             // TODO: use a different receiver name?

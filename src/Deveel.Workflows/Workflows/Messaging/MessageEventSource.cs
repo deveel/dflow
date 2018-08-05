@@ -23,7 +23,7 @@ namespace Deveel.Workflows.Messaging
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEvent)context.EventHandler;
+            var messageEvent = (MessageEventHandler)context.Event;
 
             if (!waiters.ContainsKey(messageEvent.Subscription))
             {
@@ -44,7 +44,7 @@ namespace Deveel.Workflows.Messaging
 
         protected override Task DetachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEvent)context.EventHandler;
+            var messageEvent = (MessageEventHandler)context.Event;
 
             if (events.ContainsKey(messageEvent.Subscription))
             {

@@ -10,7 +10,7 @@ namespace Deveel.Workflows.Model
         {
             var errorSignal = context.Context.GetRequiredService<IErrorHandler>();
             var source = new ErrorEventSource(errorSignal);
-            var errorEvent = new ErrorEvent(source, Name);
+            var errorEvent = new ErrorEventHandler(source, Name);
 
             return new EventNode(Id, errorEvent);
         }

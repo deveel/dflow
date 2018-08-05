@@ -2,13 +2,13 @@
 
 namespace Deveel.Workflows.Events
 {
-    public sealed class NoneEventHandler : FlowEventHandler
+    public sealed class NoneEvent : FlowEventHandler
     {
-        public NoneEventHandler() : this("none")
+        public NoneEvent() : this("none")
         {
         }
 
-        public NoneEventHandler(string name)
+        public NoneEvent(string name)
             : base(new NoneEventSource(), name)
         {
         }

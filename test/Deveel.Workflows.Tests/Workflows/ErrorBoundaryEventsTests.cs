@@ -27,7 +27,7 @@ namespace Deveel.Workflows
 
         protected override void OnTaskAdd(ProcessSequence sequence)
         {
-            var errorEvent = new ErrorEvent(new ErrorEventSource(errorSignal), "err");
+            var errorEvent = new ErrorEventHandler(new ErrorEventSource(errorSignal), "err");
 
             sequence.Add(new ServiceTask("task1", c => throw new ErrorException("err"))
             {

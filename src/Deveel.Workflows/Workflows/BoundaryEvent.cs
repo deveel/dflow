@@ -7,26 +7,26 @@ namespace Deveel.Workflows
 {
     public sealed class BoundaryEvent : IDisposable
     {
-        private FlowEventHandler source;
+        private FlowEventHandler handler;
         private EventContext eventContext;
         private Action<ExecutionContext, object> callback;
         private Activity attachedActivity;
 
-        public BoundaryEvent(FlowEventHandler source, FlowNode node)
+        public BoundaryEvent(FlowEventHandler handler, FlowNode node)
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
-            this.source = source;
+            this.handler = handler;
         }
 
         public FlowNode Node { get; }
 
         public bool Interrupting { get; set; }
 
-        public EventType EventType => source.EventSource.EventType;
+        public EventType EventType => handler.EventSource.EventType;
 
         internal void Init(ExecutionContext context)
         {
-            eventContext = source.CreateContext(context);
+            eventContext = handler.CreateContext(context);
             eventContext.Attach(callback);
         }
 

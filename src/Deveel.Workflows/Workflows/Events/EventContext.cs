@@ -11,15 +11,15 @@ namespace Deveel.Workflows.Events
         private AutoResetEvent fireEvent;
         private object lastState;
 
-        public EventContext(FlowEventHandler handler, ExecutionContext parent)
+        public EventContext(FlowEventHandler @event, ExecutionContext parent)
         {
-            EventHandler = handler;
+            Event = @event;
             Parent = parent;
             scope = parent.CreateScope();
 
             var processId = parent.Process.Id;
             var instanceId = parent.Process.InstanceId;
-            EventId = new EventId(processId, instanceId, handler.EventName);
+            EventId = new EventId(processId, instanceId, @event.EventName);
 
             fireEvent = new AutoResetEvent(false);
         }
@@ -28,7 +28,7 @@ namespace Deveel.Workflows.Events
 
         public ExecutionContext Parent { get; }
 
-        public FlowEventHandler EventHandler { get; }
+        public FlowEventHandler Event { get; }
 
         public EventId EventId { get; }
 
@@ -69,7 +69,7 @@ namespace Deveel.Workflows.Events
 
         internal Task BeginAsync()
         {
-            return EventHandler.EventSource.AttachAsync(this);
+            return Event.EventSource.AttachAsync(this);
         }
 
         internal async Task FireAsync(object state)
@@ -97,8 +97,8 @@ namespace Deveel.Workflows.Events
 
         public void Dispose()
         {
-            if (EventHandler != null)
-                EventHandler.EventSource.DetachAsync(this).Wait();
+            if (Event != null)
+                Event.EventSource.DetachAsync(this).Wait();
 
             scope?.Dispose();
         }

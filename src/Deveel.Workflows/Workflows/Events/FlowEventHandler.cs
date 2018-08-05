@@ -5,10 +5,10 @@ namespace Deveel.Workflows.Events
 {
     public class FlowEventHandler
     {
-        public FlowEventHandler(FlowEventSource source, string eventName)
+        public FlowEventHandler(FlowEventSource source, string name)
         {
             EventSource = source ?? throw new ArgumentNullException(nameof(source));
-            EventName = eventName;
+            EventName = name;
         }
 
         public string EventName { get; }

@@ -6,13 +6,13 @@ namespace Deveel.Workflows
 {
     public sealed class ReceiveTask : TaskBase
     {
-        public ReceiveTask(string id, MessageEvent eventSource)
+        public ReceiveTask(string id, MessageEventHandler eventSource)
             : base(id)
         {
             Event = eventSource;
         }
 
-        public MessageEvent Event { get; }
+        public MessageEventHandler Event { get; }
 
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {

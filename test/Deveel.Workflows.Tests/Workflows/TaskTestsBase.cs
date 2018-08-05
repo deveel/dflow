@@ -47,7 +47,7 @@ namespace Deveel.Workflows
 
         private ProcessContext CreateContext(Process process)
         {
-            return SystemContext.CreateContext(process, new SystemUser(), Guid.NewGuid().ToString());
+            return SystemContext.CreateContext(process, new SystemUser(), new NoneEvent(), Guid.NewGuid().ToString());
         }
 
         protected virtual void AddServices(IServiceCollection services)
