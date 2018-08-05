@@ -92,7 +92,7 @@ b = i+1;
             var processId = "proc1";
             var process = new Process(new ProcessInfo(processId));
             process.Sequence.Add(new ManualTask("some manual"));
-            process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine()));
+            process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine(), new ScriptInfo()));
 
             var context = system.CreateContext(process);
             await context.SetVariableAsync("a", 2);

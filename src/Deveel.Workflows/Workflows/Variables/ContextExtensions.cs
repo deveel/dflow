@@ -29,6 +29,28 @@ namespace Deveel.Workflows.Variables
             return false;
         }
 
+        public static bool TrySetVariable(this IContext context, string name, object value)
+        {
+            var current = context;
+            while (current != null)
+            {
+                if (current is IVariableContext)
+                {
+                    var variables = ((IVariableContext)current).Variables;
+                    if (variables.TryGetVariableAsync(name, out Variable v, context.CancellationToken).Result)
+                    {
+                        variables.SetVariableAsync(new Variable(name, value), context.CancellationToken).Wait();
+                        return true;
+                    }
+                }
+
+                current = current.Parent;
+            }
+
+            // TODO: throw a Null-Reference Exception?
+            return false;
+        }
+
         public static async Task<object> FindVariableAsync(this IContext context, string name)
         {
             var current = context;

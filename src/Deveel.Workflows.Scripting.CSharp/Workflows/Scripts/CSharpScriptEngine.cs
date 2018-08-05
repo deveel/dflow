@@ -21,14 +21,10 @@ namespace Deveel.Workflows.Scripts
             if (scriptInfo.References != null)
                 options = options.AddReferences(scriptInfo.References);
 
-            options = options.AddReferences(typeof(IContext).Assembly)
+            options = options
                 .AddReferences(typeof(DynamicObject).Assembly)
                 .AddReferences(typeof(Microsoft.CSharp.RuntimeBinder.CSharpArgumentInfo).Assembly)
                 .AddReferences(typeof(ExpandoObject).Assembly);
-
-            options = options.AddImports("Deveel.Workflows")
-                .AddImports("Deveel.Workflows.Variables")
-                .AddImports("Deveel.Workflows.Scripts");
 
             if (scriptInfo.Imports != null)
             {

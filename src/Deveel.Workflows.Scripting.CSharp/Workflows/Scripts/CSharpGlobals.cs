@@ -40,6 +40,11 @@ namespace Deveel.Workflows.Scripts
 
             public override bool TrySetMember(SetMemberBinder binder, object value)
             {
+                if (context.TrySetVariable(binder.Name, value))
+                {
+                    return true;
+                }
+
                 return base.TrySetMember(binder, value);
             }
         }

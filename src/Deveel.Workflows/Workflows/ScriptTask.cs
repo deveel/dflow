@@ -11,27 +11,24 @@ namespace Deveel.Workflows
 {
     public sealed class ScriptTask : TaskBase
     {
-        public ScriptTask(string id, string code, IScriptEngine engine) : base(id)
+        public ScriptTask(string id, string code, IScriptEngine engine, ScriptInfo scriptInfo) : base(id)
         {
             Engine = engine;
             Code = code;
+            ScriptInfo = scriptInfo;
         }
 
         public IScriptEngine Engine { get; }
 
         public  string Code { get; }
 
-        public IEnumerable<string> Imports { get; set; }
-
-        public IEnumerable<Assembly> References { get; set; }
+        public ScriptInfo ScriptInfo { get; }
 
         protected override Task<object> CreateStateAsync(ExecutionContext context)
         {
-            var executor = Engine.CreateExecutor(Code, new ScriptInfo
-            {
-                Imports = Imports,
-                References = References
-            });
+            var scriptInfo = ScriptInfo.Generate(context, ScriptInfo);
+
+            var executor = Engine.CreateExecutor(Code, scriptInfo);
 
             return Task.FromResult<object>(executor);
         }

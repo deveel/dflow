@@ -39,7 +39,7 @@ namespace Deveel.Workflows.Scripts
 context.SetVariableAsync(""c"", i).Wait();
 }";
 
-            var executor = engine.CreateExecutor(code, new ScriptInfo());
+            var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
 
             var globals = context.CreateScript();
             await globals.SetVariableAsync("a", 2);
@@ -51,6 +51,31 @@ context.SetVariableAsync(""c"", i).Wait();
             var variable = await context.FindVariableAsync("c");
 
             Assert.Equal(1, variable);
+        }
+
+        [Fact]
+        public async void SetVars()
+        {
+            const string code =
+    @"for(int i = 0; i < vars.a; i++) {
+vars.b = i;
+}";
+
+            var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
+
+            var globals = context.CreateScript();
+            await globals.SetVariableAsync("a", 2);
+            await globals.SetVariableAsync("b", -2);
+
+            var result = await executor.ExecuteAsync(globals);
+
+            Assert.NotNull(result);
+
+            var variable = await context.FindVariableAsync("b");
+
+            Assert.Equal(1, variable);
+
+
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using Deveel.Workflows.Scripts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -47,7 +48,14 @@ namespace Deveel.Workflows.Model
                 script = Script;
             }
 
-            return new ScriptTask(Id, script, engine);
+            var scriptInfo = new ScriptInfo();
+
+            if (References != null)
+                scriptInfo.References = References.Select(x => Assembly.Load(x));
+            if (Imports != null)
+                scriptInfo.Imports = Imports.ToList();
+
+            return new ScriptTask(Id, script, engine, scriptInfo);
         }
     }
 }
