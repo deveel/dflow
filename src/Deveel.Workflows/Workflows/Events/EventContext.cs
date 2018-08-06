@@ -16,7 +16,7 @@ namespace Deveel.Workflows.Events
             EventSource = source;
 
             var processId = parent.Process.Id;
-            var instanceId = parent.Process.InstanceId;
+            var instanceId = parent.Process.InstanceKey;
             EventId = new EventId(processId, instanceId, source.EventName);
 
             fireEvent = new AutoResetEvent(false);

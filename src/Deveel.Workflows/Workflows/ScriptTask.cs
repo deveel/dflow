@@ -39,12 +39,12 @@ namespace Deveel.Workflows
             var variables = await registry.GetVariablesAsync(context.CancellationToken);
             var executor = (IScriptingExecutor) state;
 
-            var globals = context.CreateScriptContext();
+            using (var scriptContext = new ScriptContext(context))
+            {
+                var result = executor.ExecuteAsync(scriptContext);
+            }
 
-            var result = executor.ExecuteAsync(globals);
-
-
-            // TODO: set the result in scope
+                // TODO: set the result in scope
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Deveel.Workflows
         [Fact]
         public async Task SingleActivityFlow()
         {
-            var workflow = new Process(new ProcessInfo("test1"));
+            var workflow = new Process(new ProcessInfo("test1", Guid.NewGuid().ToString()));
             workflow.Sequence.Add(new ServiceTask("task1", c => {}));
 
             var services = new ServiceCollection();
@@ -39,7 +39,7 @@ namespace Deveel.Workflows
             var system = new SystemContext(provider);
 
             var processId = "proc1";
-            var process = new Process(new ProcessInfo(processId));
+            var process = new Process(new ProcessInfo(processId, Guid.NewGuid().ToString()));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new ForkGateway("fork")
             {
@@ -90,7 +90,7 @@ b = i+1;
             var system = new SystemContext(provider);
 
             var processId = "proc1";
-            var process = new Process(new ProcessInfo(processId));
+            var process = new Process(new ProcessInfo(processId, Guid.NewGuid().ToString()));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new ScriptTask("script", script, new CSharpScriptEngine(), new ScriptInfo()));
 
@@ -115,7 +115,7 @@ b = i+1;
             var system = new SystemContext(provider);
 
             var processId = "proc1";
-            var process = new Process(new ProcessInfo(processId));
+            var process = new Process(new ProcessInfo(processId, Guid.NewGuid().ToString()));
             process.Sequence.Add(new ManualTask("some manual"));
             process.Sequence.Add(new BusinessRuleTask("bizTask", "bizRule1"));
 

@@ -7,11 +7,8 @@ namespace Deveel.Workflows.Actors
         public User(string name)
         {
             Name = name;
-            EndPoints = new List<IUserEndPoint>();
         }
 
         public string Name { get; }
-
-        public ICollection<IUserEndPoint> EndPoints { get; }
     }
 }

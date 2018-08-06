@@ -4,13 +4,17 @@ namespace Deveel.Workflows.Model
 {
     public sealed class ModelBuildContext
     {
-        internal ModelBuildContext(string processId, IContext context)
+        internal ModelBuildContext(IContext context, ProcessInfo processInfo)
         {
-            ProcessId = processId;
             Context = context;
+            ProcessInfo = processInfo;
         }
 
-        public string ProcessId { get; }
+        public ProcessInfo ProcessInfo { get; }
+
+        public string ProcessId => ProcessInfo.Id;
+
+        public string InstanceKey => ProcessInfo.InstanceKey;
 
         public IContext Context { get; }
     }

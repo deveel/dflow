@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Deveel.Workflows.Variables;
@@ -21,12 +22,11 @@ namespace Deveel.Workflows.BusinessRules
 
         public string Name { get; }
 
-        public async Task ExecuteAsync(ExecutionContext context, CancellationToken cancellationToken)
+        public Task ExecuteAsync(IEnumerable<object> args, CancellationToken cancellationToken)
         {
-            var variables = await context.GetVariablesAsync();
-
-            session.InsertAll(variables);
+            session.InsertAll(args);
             session.Fire();
+            return Task.CompletedTask;
         }
     }
 }

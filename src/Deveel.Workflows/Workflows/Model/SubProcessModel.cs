@@ -7,17 +7,7 @@ namespace Deveel.Workflows.Model
     {
         public ProcessSequenceModel Sequence { get; set; }
 
-        internal override FlowNode BuildNode(ModelBuildContext context)
-        {
-            var process = BuildProcess(context);
-
-            if (LoopCondition != null)
-                process = new ActivityLoop(process, FlowExpression.Parse(LoopCondition));
-
-            return process;
-        }
-
-        private Activity BuildProcess(ModelBuildContext context)
+        internal override Activity BuildActivity(ModelBuildContext context)
         {
             if (String.IsNullOrWhiteSpace(Id))
                 throw new InvalidOperationException();

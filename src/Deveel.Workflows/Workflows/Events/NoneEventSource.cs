@@ -8,6 +8,18 @@ namespace Deveel.Workflows.Events
         {
         }
 
+        public NoneEventSource()
+            : this(null)
+        {
+        }
+
+        static NoneEventSource()
+        {
+            Instance = new NoneEventSource();
+        }
+
         public override EventType EventType => EventType.None;
+
+        public static NoneEventSource Instance { get; }
     }
 }

@@ -1,35 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using Deveel.Workflows.Actors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows.Scripts
 {
-    public sealed class ScriptContext : IContext
+    public sealed class ScriptContext : ContextBase
     {
         private IServiceScope scope;
 
-        internal ScriptContext(ExecutionContext context)
+        public ScriptContext(ExecutionContext context)
+            : base(context)
         {
-            Parent = context;
-            scope = context.CreateScope();
-        }
-
-        public ExecutionContext Parent { get; }
-
-        IContext IContext.Parent => Parent;
-
-        CancellationToken IContext.CancellationToken => CancellationToken.None;
-
-        object IServiceProvider.GetService(Type serviceType)
-        {
-            return scope.ServiceProvider.GetService(serviceType);
-        }
-
-        public void Dispose()
-        {
-            scope?.Dispose();
         }
     }
 }

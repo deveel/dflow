@@ -27,7 +27,7 @@ namespace Deveel.Workflows
 
         private Process CreateProcess(string processId)
         {
-            var process = new Process(new ProcessInfo(processId));
+            var process = new Process(new ProcessInfo(processId, Guid.NewGuid().ToString()));
             OnTaskAdd(process.Sequence);
 
             return process;
@@ -47,7 +47,7 @@ namespace Deveel.Workflows
 
         private ProcessContext CreateContext(Process process)
         {
-            return SystemContext.CreateContext(process, new SystemUser(), new NoneEventSource("none"), Guid.NewGuid().ToString());
+            return SystemContext.CreateContext(process, SystemUser.Current, NoneEventSource.Instance);
         }
 
         protected virtual void AddServices(IServiceCollection services)

@@ -5,19 +5,21 @@ using Deveel.Workflows.Events;
 
 namespace Deveel.Workflows
 {
-    public sealed class BoundaryEvent : IDisposable
+    public sealed class BoundaryEvent : FlowNode
     {
-        private EventContext eventContext;
         private Action<ExecutionContext, object> callback;
         private Activity attachedActivity;
 
-        public BoundaryEvent(EventSource source, FlowNode node)
+        public BoundaryEvent(string id, EventSource source, FlowNode node)
+            : base(id)
         {
             Node = node ?? throw new ArgumentNullException(nameof(node));
             EventSource = source;
         }
 
         public FlowNode Node { get; }
+
+        public override FlowNodeType NodeType => FlowNodeType.BoundaryEvent;
 
         public bool Interrupting { get; set; }
 
@@ -27,21 +29,10 @@ namespace Deveel.Workflows
 
         public string EventName => EventSource.EventName;
 
-        internal void Init(ExecutionContext context)
-        {
-            eventContext = EventSource.NewEventContext(context);
-            eventContext.Attach(callback);
-        }
-
         internal void AttachTo(Activity activity)
         {
             attachedActivity = activity;
             callback = async (c, s) => await ReactAsync(c, s);
-        }
-
-        internal Task BeginAsync()
-        {
-            return eventContext.BeginAsync();
         }
 
         internal void DetachFrom(Activity activity)
@@ -62,10 +53,41 @@ namespace Deveel.Workflows
             return Node.ExecuteAsync(context);
         }
 
-        public void Dispose()
+        protected override Task<object> CreateStateAsync(ExecutionContext context)
         {
-            eventContext?.Detach(callback);
-            eventContext?.Dispose();
+            var eventContext = EventSource.NewEventContext(context);
+            eventContext.Attach(callback);
+
+            return Task.FromResult<object>(new BoundaryEventState(eventContext, callback));
         }
+
+        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        {
+            var boundaryState = (BoundaryEventState)state;
+            return boundaryState.EventContext.BeginAsync();
+        }
+
+        #region BoundaryEventState
+
+        class BoundaryEventState : IDisposable
+        {
+            public BoundaryEventState(EventContext context, Action<ExecutionContext, object> callback)
+            {
+                EventContext = context;
+                Callback = callback;
+            }
+
+            public EventContext EventContext { get; }
+
+            public Action<ExecutionContext, object> Callback { get; }
+
+            public void Dispose()
+            {
+                EventContext?.Detach(Callback);
+                EventContext?.Dispose();
+            }
+        }
+
+        #endregion
     }
 }

@@ -18,13 +18,12 @@ namespace Deveel.Workflows
 
         internal override ExecutionContext CreateScope(ExecutionContext parent)
         {
-            var scope = base.CreateScope(parent);
+            var scope = new ActivityContext(parent, this);
             cancelHandle = () => scope.Cancel();
             interruptHandle = () => scope.Interrupt();
 
             foreach (var boundaryEvent in BoundaryEvents)
             {
-                boundaryEvent.Init(scope);
                 scope.AddEvent(boundaryEvent);
             }
 

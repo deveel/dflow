@@ -4,7 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows.Model
 {
-    public sealed class CatchErrorEventModel : EventModel
+    public sealed class CatchErrorEventModel : CatchEventModel
     {
         public string ErrorVariableName { get; set; }
 

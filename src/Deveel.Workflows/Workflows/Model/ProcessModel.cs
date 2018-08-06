@@ -25,7 +25,7 @@ namespace Deveel.Workflows.Model
             if (String.IsNullOrWhiteSpace(Id))
                 throw new InvalidOperationException();
 
-            var process = new Process(new ProcessInfo(Id));
+            var process = new Process(new ProcessInfo(Id, context.InstanceKey));
 
             foreach (var model in Sequence)
             {
@@ -36,13 +36,12 @@ namespace Deveel.Workflows.Model
             return process;
         }
 
-        public Process Build(IContext context)
+        public Process Build(IContext context, string instanceKey)
         {
-            var buildContext = new ModelBuildContext(Id, context);
-            var process = new Process(new ProcessInfo(Id)
-            {
-                Name = Name
-            });
+            var processInfo = new ProcessInfo(Id, instanceKey);
+            var buildContext = new ModelBuildContext(context, processInfo);
+
+            var process = new Process(processInfo);
 
             foreach (var node in Sequence)
             {

@@ -5,20 +5,24 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Errors
 {
-    public sealed class ErrorCreator : IEventRise
+    public sealed class ErrorEventRise : IEventRise
     {
         private readonly IErrorSignaler signaler;
 
-        public ErrorCreator(IErrorSignaler signaler)
+        public ErrorEventRise(IErrorSignaler signaler)
         {
             this.signaler = signaler;
         }
 
         EventType IEventRise.EventType => EventType.Error;
 
-        public Task FireAsync(IEventArgument arg, CancellationToken cancellationToken)
+        Task IEventRise.FireAsync(IEventArgument arg, CancellationToken cancellationToken)
         {
-            var error = (ThrownError)arg;
+            return FireAsync((ThrownError)arg, cancellationToken);
+        }
+
+        public Task FireAsync(ThrownError error, CancellationToken cancellationToken)
+        {
             return signaler.ThrowErrorAsync(error, cancellationToken);
         }
     }

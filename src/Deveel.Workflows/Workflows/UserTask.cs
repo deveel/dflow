@@ -39,7 +39,7 @@ namespace Deveel.Workflows
             };
 
             // this blocks the process until the assignment is done
-            var result = await registry.AssignAsync(assignment);
+            var result = await registry.AssignAsync(assignment, context.CancellationToken);
 
             if (!result.Completed)
                 throw new InvalidOperationException();

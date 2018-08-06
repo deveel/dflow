@@ -26,7 +26,7 @@ namespace Deveel.Workflows.Model
 
         public ICollection<string> References { get; set; }
 
-        internal override TaskBase BuildTask(ModelBuildContext context)
+        internal override Activity BuildActivity(ModelBuildContext context)
         {
             var engine = context.Context.GetServices<IScriptEngine>()
                 .FirstOrDefault(x => x.Format == Format);

@@ -25,7 +25,7 @@ namespace Deveel.Workflows.Scripts
                 .BuildServiceProvider();
             var system = new SystemContext(provider);
 
-            var process = new Process(new ProcessInfo("test"));
+            var process = new Process(new ProcessInfo("test", Guid.NewGuid().ToString()));
             var processContext = system.CreateContext(process);
 
             return processContext.CreateContext(new ManualTask("task"));
@@ -41,7 +41,7 @@ context.SetVariableAsync(""c"", i).Wait();
 
             var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
 
-            var globals = context.CreateScriptContext();
+            var globals = new ScriptContext(context);
             await globals.SetVariableAsync("a", 2);
 
             var result = await executor.ExecuteAsync(globals);
@@ -63,7 +63,7 @@ vars.b = i;
 
             var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
 
-            var globals = context.CreateScriptContext();
+            var globals = new ScriptContext(context);
             await globals.SetVariableAsync("a", 2);
             await globals.SetVariableAsync("b", -2);
 

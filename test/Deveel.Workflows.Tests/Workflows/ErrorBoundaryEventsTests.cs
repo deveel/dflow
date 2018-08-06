@@ -32,7 +32,7 @@ namespace Deveel.Workflows
             sequence.Add(new ServiceTask("task1", c => throw new ErrorException("err"))
             {
                 BoundaryEvents = {
-                    new BoundaryEvent(errorEvent, new ServiceTask("catch", c => catchEvent.Set()))
+                    new BoundaryEvent("b1", errorEvent, new ServiceTask("catch", c => catchEvent.Set()))
                 }
             });
         }

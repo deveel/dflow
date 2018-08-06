@@ -36,7 +36,7 @@ namespace Deveel.Workflows.Model
             var context = new Mock<IContext>();
             context.Setup(x => x.GetService(It.Is<Type>(type => typeof(IUserQuery).IsAssignableFrom(type)))).Returns(new MockUserQuery());
 
-            var process = model.Build(context.Object);
+            var process = model.Build(context.Object, Guid.NewGuid().ToString());
 
             Assert.NotNull(process);
             Assert.Equal(model.Id, process.ProcessInfo.Id);
@@ -94,7 +94,7 @@ namespace Deveel.Workflows.Model
 
             var context = new SystemContext(scope);
 
-            var process = model.Build(context);
+            var process = model.Build(context, Guid.NewGuid().ToString());
 
             Assert.NotNull(process);
             Assert.Equal(model.Id, process.ProcessInfo.Id);

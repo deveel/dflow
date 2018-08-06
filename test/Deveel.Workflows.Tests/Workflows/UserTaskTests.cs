@@ -25,8 +25,8 @@ namespace Deveel.Workflows
             services.AddSingleton<IAssignmentRegistry>(_ =>
             {
                 var registry = new Mock<IAssignmentRegistry>();
-                registry.Setup(x => x.AssignAsync(It.Is<UserAssignment>(a => a.TaskId == "task1")))
-                    .Returns<UserAssignment>(async assignment =>
+                registry.Setup(x => x.AssignAsync(It.Is<UserAssignment>(a => a.TaskId == "task1"), It.IsAny<CancellationToken>()))
+                    .Returns<UserAssignment, CancellationToken>(async (assignment, t) =>
                     {
                         await Task.Delay(3000);
                         return new AssignmentResult(true);

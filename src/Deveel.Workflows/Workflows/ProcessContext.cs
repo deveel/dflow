@@ -13,13 +13,12 @@ namespace Deveel.Workflows
         private CancellationTokenSource tokenSource;
         private List<ExecutionContext> currentContexts;
 
-        internal ProcessContext(SystemContext parent, Process process, IActor actor, EventSource trigger, string instanceId)
+        internal ProcessContext(SystemContext parent, Process process, IActor actor, EventSource trigger)
             : base(parent)
         {
             Process = process;
             Actor = actor;
             Trigger = trigger;
-            InstanceId = instanceId;
 
             tokenSource = new CancellationTokenSource();
 
@@ -27,8 +26,6 @@ namespace Deveel.Workflows
         }
 
         public override CancellationToken CancellationToken => tokenSource.Token;
-
-        public string InstanceId { get; }
 
         public Process Process { get; }
 
@@ -40,6 +37,8 @@ namespace Deveel.Workflows
         public bool IsRunning => Status == ProcessStatus.Running;
 
         public string Id => Process.ProcessInfo.Id;
+
+        public string InstanceKey => Process.ProcessInfo.InstanceKey;
 
         public IActor Actor { get; }
 

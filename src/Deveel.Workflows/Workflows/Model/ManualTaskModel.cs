@@ -4,7 +4,7 @@ namespace Deveel.Workflows.Model
 {
     public sealed class ManualTaskModel : TaskModel
     {
-        internal override TaskBase BuildTask(ModelBuildContext context)
+        internal override Activity BuildActivity(ModelBuildContext context)
         {
             return new ManualTask(Id);
         }

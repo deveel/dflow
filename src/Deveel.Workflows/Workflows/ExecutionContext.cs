@@ -12,11 +12,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
 {
-    public sealed class ExecutionContext : ContextBase, IVariableContext
+    public class ExecutionContext : ContextBase, IVariableContext
     {
         private readonly CancellationTokenSource tokenSource;
-
-        private List<BoundaryEvent> events;
 
         public ExecutionContext(IContext parent, FlowNode node)
             : base(parent)
@@ -49,14 +47,6 @@ namespace Deveel.Workflows
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
         public override CancellationToken CancellationToken => tokenSource.Token;
-
-        internal void AddEvent(BoundaryEvent boundaryEvent)
-        {
-            if (events == null)
-                events = new List<BoundaryEvent>();
-
-            events.Add(boundaryEvent);
-        }
 
         private ProcessContext FindProcess()
         {
@@ -91,7 +81,7 @@ namespace Deveel.Workflows
                 var signal = this.GetService<IErrorSignaler>();
                 if (signal != null)
                 {
-                    await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceId, ((IError)error).Name), CancellationToken);
+                    await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceKey, ((IError)error).Name), CancellationToken);
                 }
 
                 return true;
@@ -103,15 +93,9 @@ namespace Deveel.Workflows
         internal void Complete()
             => ChangeStatus(ExecutionStatus.Completed);
 
-        internal async Task StartAsync()
+        internal virtual async Task StartAsync()
         {
             ChangeStatus(ExecutionStatus.Executing);
-
-            if (events != null)
-            {
-                foreach (var e in events)
-                    await e.BeginAsync();
-            }
         }
 
         internal void Cancel()
@@ -132,11 +116,6 @@ namespace Deveel.Workflows
             return new ExecutionContext(this, node);
         }
 
-        public ScriptContext CreateScriptContext()
-        {
-            return new ScriptContext(this);
-        }
-
         internal async Task<ExecutionState> GetStateAsync()
         {
             DateTimeOffset timeStamp;
@@ -148,7 +127,7 @@ namespace Deveel.Workflows
                 timeStamp = FinishedAt ?? DateTimeOffset.UtcNow;
             }
 
-            var state = new ExecutionState(Process.Id, Process.InstanceId, Node.Id, Status, timeStamp);
+            var state = new ExecutionState(Process.Id, Process.InstanceKey, Node.Id, Status, timeStamp);
             if (Status == ExecutionStatus.Failed)
                 state.Error = Error;
 

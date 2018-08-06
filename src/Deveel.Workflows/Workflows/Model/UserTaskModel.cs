@@ -10,7 +10,7 @@ namespace Deveel.Workflows.Model
 
         public DateTimeOffset? DueDate { get; set; }
 
-        internal override TaskBase BuildTask(ModelBuildContext context)
+        internal override Activity BuildActivity(ModelBuildContext context)
         {
             return new UserTask(Id, Assignee, DueDate);
         }

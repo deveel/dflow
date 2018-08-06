@@ -6,7 +6,7 @@ namespace Deveel.Workflows.Model
     {
         public string ExecutorServiceType { get; set; }
     
-        internal override TaskBase BuildTask(ModelBuildContext context)
+        internal override Activity BuildActivity(ModelBuildContext context)
         {
             var serviceType = Type.GetType(ExecutorServiceType, false, true);
 
