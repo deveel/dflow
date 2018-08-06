@@ -5,23 +5,24 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Timers
 {
-    public sealed class TimerEventSource : FlowEventSource
+    public sealed class TimerEventSource : EventSource
     {
         private IJobScheduler scheduler;
 
-        public TimerEventSource(IJobScheduler scheduler)
+        public TimerEventSource(IJobScheduler scheduler, string eventName, ScheduleInfo scheduleInfo)
+            : base(eventName)
         {
             this.scheduler = scheduler;
+            ScheduleInfo = scheduleInfo;
         }
+
+        public ScheduleInfo ScheduleInfo { get; }
 
         public override EventType EventType => EventType.Timer;
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            var timer = (TimerEventHandler)context.EventHandler;
-            var scheduleInfo = timer.ScheduleInfo;
-
-            return scheduler.ScheduleAsync(context.EventId.ToString(), scheduleInfo, new ScheduleCallback(context), context.CancellationToken);
+            return scheduler.ScheduleAsync(context.EventId.ToString(), ScheduleInfo, new ScheduleCallback(context), context.CancellationToken);
         }
 
         protected override Task DetachContextAsync(EventContext context)

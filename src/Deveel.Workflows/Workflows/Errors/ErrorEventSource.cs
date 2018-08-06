@@ -6,13 +6,14 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Errors
 {
-    public sealed class ErrorEventSource : FlowEventSource
+    public sealed class ErrorEventSource : EventSource
     {
         private IErrorHandler handler;
         private Dictionary<EventId, EventContext> events;
         private Dictionary<EventId, Task> waiters;
 
-        public ErrorEventSource(IErrorHandler handler)
+        public ErrorEventSource(IErrorHandler handler, string eventName)
+            : base(eventName)
         {
             this.handler = handler;
             events = new Dictionary<EventId, EventContext>();

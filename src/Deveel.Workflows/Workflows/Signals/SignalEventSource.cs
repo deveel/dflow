@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Signals
 {
-    public sealed class SignalEventSource : FlowEventSource
+    public sealed class SignalEventSource : EventSource
     {
         private ISignalRegistry registry;
 
-        public SignalEventSource(ISignalRegistry registry)
+        public SignalEventSource(ISignalRegistry registry, string eventName)
+            : base(eventName)
         {
             this.registry = registry;
         }

@@ -7,20 +7,20 @@ namespace Deveel.Workflows
 {
     public sealed class ReceiveTask : TaskBase
     {
-        public ReceiveTask(string id, MessageEventHandler handler, string variableName)
+        public ReceiveTask(string id, MessageEventSource source, string variableName)
             : base(id)
         {
-            Event = handler;
+            EventSource = source;
             MessageVariableName = variableName;
         }
 
-        public MessageEventHandler Event { get; }
+        public MessageEventSource EventSource { get; }
 
         public string MessageVariableName { get; }
 
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            using (var eventContext = Event.CreateContext(context))
+            using (var eventContext = EventSource.NewEventContext(context))
             {
                 var message = eventContext.Wait(context.CancellationToken);
 

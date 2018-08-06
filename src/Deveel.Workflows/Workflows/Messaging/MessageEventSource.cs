@@ -6,28 +6,31 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Messaging
 {
-    public sealed class MessageEventSource : FlowEventSource
+    public sealed class MessageEventSource : EventSource
     {
         private IMessageReceiver receiver;
         private Dictionary<MessageSubscription, Task> waiters;
         private Dictionary<MessageSubscription, EventContext> events;
 
-        public MessageEventSource(IMessageReceiver receiver)
+        public MessageEventSource(IMessageReceiver receiver, string eventName, MessageSubscription subscription)
+            : base(eventName)
         {
             this.receiver = receiver;
+            Subscription = subscription;
+
             waiters = new Dictionary<MessageSubscription, Task>();
             events = new Dictionary<MessageSubscription, EventContext>();
         }
 
         public override EventType EventType => EventType.Message;
 
+        public MessageSubscription Subscription { get; }
+
         protected override Task AttachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEventHandler)context.EventHandler;
-
-            if (!waiters.ContainsKey(messageEvent.Subscription))
+            if (!waiters.ContainsKey(Subscription))
             {
-                waiters[messageEvent.Subscription] = Task.Run(async () => await ReceiveAsync(messageEvent.Subscription, context.CancellationToken));
+                waiters[Subscription] = Task.Run(async () => await ReceiveAsync(Subscription, context.CancellationToken));
             }
 
             return Task.CompletedTask;
@@ -44,15 +47,13 @@ namespace Deveel.Workflows.Messaging
 
         protected override Task DetachContextAsync(EventContext context)
         {
-            var messageEvent = (MessageEventHandler)context.EventHandler;
-
-            if (events.ContainsKey(messageEvent.Subscription))
+            if (events.ContainsKey(Subscription))
             {
-                var waiter = waiters[messageEvent.Subscription];
+                var waiter = waiters[Subscription];
                 waiter.Dispose();
 
-                waiters.Remove(messageEvent.Subscription);
-                events.Remove(messageEvent.Subscription);
+                waiters.Remove(Subscription);
+                events.Remove(Subscription);
             }
 
             return Task.CompletedTask;

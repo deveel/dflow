@@ -11,10 +11,9 @@ namespace Deveel.Workflows.Model
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
             var errorSignal = context.Context.GetRequiredService<IErrorHandler>();
-            var source = new ErrorEventSource(errorSignal);
-            var errorEvent = new ErrorEventHandler(source, Name);
+            var source = new ErrorEventSource(errorSignal, Name);
 
-            return new CatchEvent(Id, errorEvent, ErrorVariableName);
+            return new CatchEvent(Id, source, ErrorVariableName);
         }
     }
 }

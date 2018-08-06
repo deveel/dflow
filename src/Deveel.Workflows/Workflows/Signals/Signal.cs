@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Deveel.Workflows.Events;
+using System;
 
 namespace Deveel.Workflows.Signals
 {
-    public sealed class Signal
+    public sealed class Signal : IEventArgument
     {
         public Signal(string name, string sender)
         {
@@ -16,5 +17,7 @@ namespace Deveel.Workflows.Signals
         public DateTimeOffset TimeStamp { get; }
 
         public string Sender { get; }
+
+        EventType IEventArgument.EventType => EventType.Signal;
     }
 }

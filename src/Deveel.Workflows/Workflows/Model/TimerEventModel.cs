@@ -15,15 +15,16 @@ namespace Deveel.Workflows.Model
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
             var scheduler = context.Context.GetRequiredService<IJobScheduler>();
-            var source = new TimerEventSource(scheduler);
             var scheduleInfo = new ScheduleInfo
             {
                 CronExpression = CronExpression,
-                Duration = String.IsNullOrEmpty(Duration) ? (TimeSpan?) null : TimeSpan.Parse(Duration),
+                Duration = String.IsNullOrEmpty(Duration) ? (TimeSpan?)null : TimeSpan.Parse(Duration),
                 Date = String.IsNullOrEmpty(Date) ? (DateTimeOffset?)null : DateTimeOffset.Parse(Date)
             };
 
-            return new CatchEvent(Id, new TimerEventHandler(source, Name, scheduleInfo), null);
+            var source = new TimerEventSource(scheduler, Name, scheduleInfo);
+
+            return new CatchEvent(Id, source, null);
         }
     }
 }
