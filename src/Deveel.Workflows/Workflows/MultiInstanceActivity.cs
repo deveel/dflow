@@ -24,7 +24,7 @@ namespace Deveel.Workflows
 
         public FlowExpression CountExpression { get; }
 
-        protected override async Task<object> CreateStateAsync(ExecutionContext context)
+        protected override async Task<object> CreateStateAsync(NodeContext context)
         {
             var state = await Activity.CallCreateStateAsync(context);
             var count = await CountExpression.ReduceToAsync<int>(context, context.CancellationToken);
@@ -32,7 +32,7 @@ namespace Deveel.Workflows
             return new MultiInstanceState(state, count);
         }
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, NodeContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 
@@ -55,7 +55,7 @@ namespace Deveel.Workflows
             throw new FlowException();
         }
 
-        private async Task ExecuteParallel(ExecutionContext context, Action[] tasks)
+        private async Task ExecuteParallel(NodeContext context, Action[] tasks)
         {
             int totalCount = tasks.Length;
             int completed = 0;
@@ -76,7 +76,7 @@ namespace Deveel.Workflows
             Task.WaitAll(wrapped, context.CancellationToken);
         }
 
-        private async Task ExecuteSequential(ExecutionContext context, Action[] tasks)
+        private async Task ExecuteSequential(NodeContext context, Action[] tasks)
         {
             int totalCount = tasks.Length;
             int completed = 0;

@@ -4,13 +4,15 @@ using System;
 
 namespace Deveel.Workflows.Model
 {
-    public sealed class ThrowErrorEventModel : EventModel
+    public sealed class ThrowErrorEventModel : ThrowEventModel
     {
+        public string ErrorName { get; set; }
+
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
             var errorSignaler = context.Context.GetRequiredService<IErrorSignaler>();
 
-            return new RiseEvent(Id, new ErrorEventRise(errorSignaler), new ThrownError(context.ProcessId, context.InstanceKey, Name));
+            return new ThrowEvent(Id, new ErrorEventRise(errorSignaler), new ThrownError(context.ProcessId, context.InstanceKey, ErrorName));
         }
     }
 }

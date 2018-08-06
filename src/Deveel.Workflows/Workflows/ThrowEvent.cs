@@ -4,11 +4,11 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows
 {
-    public sealed class RiseEvent : FlowNode
+    public sealed class ThrowEvent : FlowNode
     {
         private readonly IEventRise creator;
 
-        public RiseEvent(string id, IEventRise creator, IEventArgument arg) : base(id)
+        public ThrowEvent(string id, IEventRise creator, IEventArgument arg) : base(id)
         {
             this.creator = creator;
             Argument = arg;
@@ -20,7 +20,7 @@ namespace Deveel.Workflows
 
         public EventType EventType => creator.EventType;
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             await creator.FireAsync(Argument, context.CancellationToken);
         }

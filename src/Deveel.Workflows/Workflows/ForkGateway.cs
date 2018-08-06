@@ -17,7 +17,7 @@ namespace Deveel.Workflows
 
         public ICollection<SimpleGatewayFlow> Flows { get; }
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var tasks = Flows.Select(x => x.Node.ExecuteAsync(context));
             return Task.WhenAll(tasks);

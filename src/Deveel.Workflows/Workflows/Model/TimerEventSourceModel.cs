@@ -1,10 +1,11 @@
-﻿using Deveel.Workflows.Timers;
+﻿using System;
+using Deveel.Workflows.Events;
+using Deveel.Workflows.Timers;
 using Microsoft.Extensions.DependencyInjection;
-using System;
 
 namespace Deveel.Workflows.Model
 {
-    public sealed class TimerEventModel : EventModel
+    public sealed class TimerEventSourceModel : EventSourceModel
     {
         public string CronExpression { get; set; }
 
@@ -12,7 +13,7 @@ namespace Deveel.Workflows.Model
 
         public string Date { get; set; }
 
-        internal override FlowNode BuildNode(ModelBuildContext context)
+        internal override EventSource BuildSource(ModelBuildContext context, string eventName)
         {
             var scheduler = context.Context.GetRequiredService<IJobScheduler>();
             var scheduleInfo = new ScheduleInfo
@@ -22,9 +23,7 @@ namespace Deveel.Workflows.Model
                 Date = String.IsNullOrEmpty(Date) ? (DateTimeOffset?)null : DateTimeOffset.Parse(Date)
             };
 
-            var source = new TimerEventSource(scheduler, Name, scheduleInfo);
-
-            return new CatchEvent(Id, source, null);
+            return new TimerEventSource(scheduler, eventName, scheduleInfo);
         }
     }
 }

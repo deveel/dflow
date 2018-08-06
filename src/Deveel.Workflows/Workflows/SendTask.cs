@@ -16,7 +16,7 @@ namespace Deveel.Workflows
 
         public Message Message { get; }
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, NodeContext context)
         {
             // TODO: support for sagas?
             return publisher.PusblishAsync(Message, PublishBehavior.Notify, context.CancellationToken);

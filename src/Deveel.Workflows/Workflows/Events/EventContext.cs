@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 namespace Deveel.Workflows.Events
 {
     public class EventContext : ContextBase {
-        private Action<ExecutionContext, IEventArgument> callbacks;
+        private Action<NodeContext, IEventArgument> callbacks;
         private AutoResetEvent fireEvent;
         private object lastState;
 
-        public EventContext(ExecutionContext parent, EventSource source)
+        public EventContext(NodeContext parent, EventSource source)
             : base(parent)
         {
             EventSource = source;
@@ -26,14 +26,14 @@ namespace Deveel.Workflows.Events
 
         public EventId EventId { get; }
 
-        public ExecutionContext Parent => (ExecutionContext)ParentContext;
+        public NodeContext Parent => (NodeContext)ParentContext;
         
-        internal void Attach(Action<ExecutionContext, IEventArgument> callback)
+        internal void Attach(Action<NodeContext, IEventArgument> callback)
         {
             OnAttach(callback);
         }
 
-        protected virtual void OnAttach(Action<ExecutionContext, IEventArgument> callback)
+        protected virtual void OnAttach(Action<NodeContext, IEventArgument> callback)
         {
             if (callbacks == null)
             {
@@ -41,19 +41,19 @@ namespace Deveel.Workflows.Events
             }
             else
             {
-                callbacks = (Action<ExecutionContext, IEventArgument>)Delegate.Combine(callbacks, callback);
+                callbacks = (Action<NodeContext, IEventArgument>)Delegate.Combine(callbacks, callback);
             }
         }
 
-        internal void Detach(Action<ExecutionContext, IEventArgument> callback)
+        internal void Detach(Action<NodeContext, IEventArgument> callback)
         {
             OnDetach(callback);
         }
 
-        protected virtual void OnDetach(Action<ExecutionContext, IEventArgument> callback)
+        protected virtual void OnDetach(Action<NodeContext, IEventArgument> callback)
         {
             if (callbacks != null)
-                callbacks = (Action<ExecutionContext, IEventArgument>)Delegate.Remove(callbacks, callback);
+                callbacks = (Action<NodeContext, IEventArgument>)Delegate.Remove(callbacks, callback);
         }
 
         internal Task BeginAsync()

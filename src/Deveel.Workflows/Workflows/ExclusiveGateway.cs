@@ -30,7 +30,7 @@ namespace Deveel.Workflows
             }
         }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 

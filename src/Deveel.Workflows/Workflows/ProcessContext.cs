@@ -11,7 +11,7 @@ namespace Deveel.Workflows
     public sealed class ProcessContext : ContextBase, IVariableContext
     {
         private CancellationTokenSource tokenSource;
-        private List<ExecutionContext> currentContexts;
+        private List<NodeContext> currentContexts;
 
         internal ProcessContext(SystemContext parent, Process process, IActor actor, EventSource trigger)
             : base(parent)
@@ -22,7 +22,7 @@ namespace Deveel.Workflows
 
             tokenSource = new CancellationTokenSource();
 
-            currentContexts = new List<ExecutionContext>();
+            currentContexts = new List<NodeContext>();
         }
 
         public override CancellationToken CancellationToken => tokenSource.Token;
@@ -44,17 +44,17 @@ namespace Deveel.Workflows
 
         public EventSource Trigger { get; }
 
-        public ExecutionContext CreateContext(FlowNode node)
+        public NodeContext CreateContext(FlowNode node)
         {
-            return new ExecutionContext(this, node);
+            return new NodeContext(this, node);
         }
 
-        internal void Attach(ExecutionContext context)
+        internal void Attach(NodeContext context)
         {
             currentContexts.Add(context);
         }
 
-        internal void Detach(ExecutionContext context)
+        internal void Detach(NodeContext context)
         {
             currentContexts.Remove(context);
         }

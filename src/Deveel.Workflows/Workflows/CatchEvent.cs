@@ -25,7 +25,7 @@ namespace Deveel.Workflows
 
         public string VariableName { get; }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             using (var eventContext = source.NewEventContext(context))
             {
@@ -37,7 +37,7 @@ namespace Deveel.Workflows
             }
         }
 
-        private Task ReactAsync(object state, ExecutionContext context)
+        private Task ReactAsync(object state, NodeContext context)
         {
             if (String.IsNullOrEmpty(VariableName))
                 return Task.CompletedTask;

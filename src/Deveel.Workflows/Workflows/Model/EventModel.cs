@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Deveel.Workflows.Events;
+using System;
 
 namespace Deveel.Workflows.Model
 {

@@ -1,19 +1,24 @@
 ﻿using Deveel.Workflows.Scripts;
+using Deveel.Workflows.Variables;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows
 {
-    public class ActivityContext : ExecutionContext
+    public class ActivityContext : NodeContext, IVariableContext
     {
         private List<BoundaryEvent> events;
 
         public ActivityContext(IContext parent, Activity node) : base(parent, node)
         {
+            Variables = new InMemoryVariableRegistry();
         }
 
-        internal void AddEvent(BoundaryEvent boundaryEvent)
+        public IVariableRegistry Variables { get; }
+
+
+        internal void AddBoundaryEvent(BoundaryEvent boundaryEvent)
         {
             if (events == null)
                 events = new List<BoundaryEvent>();

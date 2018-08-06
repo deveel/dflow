@@ -11,14 +11,14 @@ namespace Deveel.Workflows
             Executor = executor ?? throw new ArgumentNullException(nameof(executor));
         }
 
-        public ServiceTask(string id, Action<ExecutionContext> execute)
+        public ServiceTask(string id, Action<NodeContext> execute)
             : this(id, new DelegateTaskExecutor(execute))
         {
         }
 
         public ITaskExecutor Executor { get; }
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, NodeContext context)
         {
             return Executor.ExecuteAsync(context);
         }

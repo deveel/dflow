@@ -1,22 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Deveel.Workflows.Actors;
 using Deveel.Workflows.Errors;
-using Deveel.Workflows.Events;
-using Deveel.Workflows.Scripts;
 using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
 {
-    public class ExecutionContext : ContextBase, IVariableContext
+    public class NodeContext : ContextBase
     {
         private readonly CancellationTokenSource tokenSource;
 
-        public ExecutionContext(IContext parent, FlowNode node)
+        public NodeContext(IContext parent, FlowNode node)
             : base(parent)
         {
             Node = node;
@@ -24,8 +20,6 @@ namespace Deveel.Workflows
             tokenSource = new CancellationTokenSource();
 
             Process = FindProcess();
-
-            Variables = new InMemoryVariableRegistry();
         }
 
         public ProcessContext Process { get; }
@@ -41,8 +35,6 @@ namespace Deveel.Workflows
         public DateTimeOffset? StartedAt { get; private set; }
 
         public DateTimeOffset? FinishedAt { get; private set; }
-
-        public IVariableRegistry Variables { get; }
 
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
@@ -93,9 +85,10 @@ namespace Deveel.Workflows
         internal void Complete()
             => ChangeStatus(ExecutionStatus.Completed);
 
-        internal virtual async Task StartAsync()
+        internal virtual Task StartAsync()
         {
             ChangeStatus(ExecutionStatus.Executing);
+            return Task.CompletedTask;
         }
 
         internal void Cancel()
@@ -111,9 +104,9 @@ namespace Deveel.Workflows
             ChangeStatus(ExecutionStatus.Interrupted);
         }
 
-        public ExecutionContext CreateNodeContext(FlowNode node)
+        public NodeContext CreateScope(FlowNode node)
         {
-            return new ExecutionContext(this, node);
+            return new NodeContext(this, node);
         }
 
         internal async Task<ExecutionState> GetStateAsync()

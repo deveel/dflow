@@ -18,7 +18,7 @@ namespace Deveel.Workflows
 
         public string MessageVariableName { get; }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             using (var eventContext = EventSource.NewEventContext(context))
             {

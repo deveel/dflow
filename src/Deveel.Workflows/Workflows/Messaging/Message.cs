@@ -6,8 +6,11 @@ namespace Deveel.Workflows.Messaging
 {
     public sealed class Message : IEventArgument
     {
-        public Message()
+        public Message(string processId, string instanceId, string name)
         {
+            Name = name;
+            ProcessId = processId;
+            InstanceId = instanceId;
             Metadata = new Dictionary<string, object>();
         }
 

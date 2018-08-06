@@ -7,7 +7,7 @@ namespace Deveel.Workflows.Scripts
     {
         private IServiceScope scope;
 
-        public ScriptContext(ExecutionContext context)
+        public ScriptContext(NodeContext context)
             : base(context)
         {
         }

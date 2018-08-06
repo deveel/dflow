@@ -5,6 +5,6 @@ namespace Deveel.Workflows
 {
     public interface IMergeStrategy
     {
-        Task MergeAsync(ExecutionContext context);
+        Task MergeAsync(NodeContext context);
     }
 }

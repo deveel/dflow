@@ -21,13 +21,13 @@ namespace Deveel.Workflows
 
         public ICollection<string> VariableNames { get; set; }
 
-        protected override async Task<object> CreateStateAsync(ExecutionContext context)
+        protected override async Task<object> CreateStateAsync(NodeContext context)
         {
             var repository = context.GetRequiredService<IRulesProvider>();
             return await repository.FindRuleAsync(RuleId);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var rule = (IRule) state;
 

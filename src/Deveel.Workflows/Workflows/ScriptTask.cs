@@ -24,7 +24,7 @@ namespace Deveel.Workflows
 
         public ScriptInfo ScriptInfo { get; }
 
-        protected override Task<object> CreateStateAsync(ExecutionContext context)
+        protected override Task<object> CreateStateAsync(NodeContext context)
         {
             var scriptInfo = ScriptInfo.Generate(context, ScriptInfo);
 
@@ -33,7 +33,7 @@ namespace Deveel.Workflows
             return Task.FromResult<object>(executor);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var registry = context.GetRequiredService<IVariableRegistry>();
             var variables = await registry.GetVariablesAsync(context.CancellationToken);

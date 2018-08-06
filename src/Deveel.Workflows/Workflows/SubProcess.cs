@@ -14,7 +14,7 @@ namespace Deveel.Workflows
 
         public ProcessSequence Sequence { get; }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             foreach (var node in Sequence)
             {

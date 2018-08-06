@@ -22,13 +22,13 @@ namespace Deveel.Workflows
 
         public IDictionary<string, object> Metadata { get; set; }
 
-        protected override async Task<object> CreateStateAsync(ExecutionContext context)
+        protected override async Task<object> CreateStateAsync(NodeContext context)
         {
             var query = context.GetRequiredService<IUserQuery>();
             return await query.FindUserAsync(Assignee);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var registry = context.GetRequiredService<IAssignmentRegistry>();
             var user = (User) state;

@@ -19,12 +19,12 @@ namespace Deveel.Workflows.Events
 
         public string EventName { get; }
 
-        protected virtual EventContext OnNewEventContext(ExecutionContext context)
+        protected virtual EventContext OnNewEventContext(NodeContext context)
         {
             return new EventContext(context, this);
         }
 
-        internal EventContext NewEventContext(ExecutionContext context)
+        internal EventContext NewEventContext(NodeContext context)
         {
             return OnNewEventContext(context);
         }

@@ -17,20 +17,20 @@ namespace Deveel.Workflows
 
         public abstract FlowNodeType NodeType { get; }
 
-        protected virtual Task<object> CreateStateAsync(ExecutionContext context)
+        protected virtual Task<object> CreateStateAsync(NodeContext context)
         {
             return Task.FromResult<object>(null);
         }
 
-        internal Task<object> CallCreateStateAsync(ExecutionContext context)
+        internal Task<object> CallCreateStateAsync(NodeContext context)
             => CreateStateAsync(context);
 
-        internal virtual ExecutionContext CreateScope(ExecutionContext parent)
+        internal virtual NodeContext CreateScope(NodeContext parent)
         {
-            return parent.CreateNodeContext(this);
+            return parent.CreateScope(this);
         }
 
-        internal async Task ExecuteAsync(ExecutionContext context)
+        internal async Task ExecuteAsync(NodeContext context)
         {
             if (context == null)
                 throw new ArgumentNullException(nameof(context));
@@ -64,11 +64,13 @@ namespace Deveel.Workflows
             finally
             {
                 await RegisterState(scope);
+
+                scope.Dispose();
             }
 
         }
 
-        private async Task RegisterState(ExecutionContext scope)
+        private async Task RegisterState(NodeContext scope)
         {
             try
             {
@@ -83,9 +85,9 @@ namespace Deveel.Workflows
 
         }
 
-        protected abstract Task ExecuteNodeAsync(object state, ExecutionContext context);
+        protected abstract Task ExecuteNodeAsync(object state, NodeContext context);
 
-        internal Task CallExecuteNodeAsync(object state, ExecutionContext context)
+        internal Task CallExecuteNodeAsync(object state, NodeContext context)
         {
             return ExecuteNodeAsync(state, context);
         }

@@ -16,7 +16,7 @@ namespace Deveel.Workflows
 
         public BoundaryEventCollection BoundaryEvents { get; }
 
-        internal override ExecutionContext CreateScope(ExecutionContext parent)
+        internal override NodeContext CreateScope(NodeContext parent)
         {
             var scope = new ActivityContext(parent, this);
             cancelHandle = () => scope.Cancel();
@@ -24,7 +24,7 @@ namespace Deveel.Workflows
 
             foreach (var boundaryEvent in BoundaryEvents)
             {
-                scope.AddEvent(boundaryEvent);
+                scope.AddBoundaryEvent(boundaryEvent);
             }
 
             return scope;

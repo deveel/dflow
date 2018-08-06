@@ -10,7 +10,7 @@ namespace Deveel.Workflows.Scripts
     public class CSharpScriptsTests
     {
         private IScriptEngine engine;
-        private ExecutionContext context;
+        private NodeContext context;
 
         public CSharpScriptsTests()
         {
@@ -18,7 +18,7 @@ namespace Deveel.Workflows.Scripts
             context = CreateContext();
         }
 
-        private ExecutionContext CreateContext()
+        private NodeContext CreateContext()
         {
             var provider = new ServiceCollection()
                 .AddSingleton<IVariableRegistry, InMemoryVariableRegistry>()

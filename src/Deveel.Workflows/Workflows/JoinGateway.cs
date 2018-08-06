@@ -22,7 +22,7 @@ namespace Deveel.Workflows
             Flows = new GatewayFlowCollection<InGatewayFlow>(this);
         }
 
-        public JoinGateway(string id, Action<ExecutionContext> merge)
+        public JoinGateway(string id, Action<NodeContext> merge)
             : this(id, new DelegatedMergeStrategy(merge))
         {
         }
@@ -42,7 +42,7 @@ namespace Deveel.Workflows
                 throw new ArgumentException();
         }
 
-        protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var registry = context.GetRequiredService<IExecutionRegistry>();
 

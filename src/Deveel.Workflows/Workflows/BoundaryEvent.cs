@@ -7,7 +7,7 @@ namespace Deveel.Workflows
 {
     public sealed class BoundaryEvent : FlowNode
     {
-        private Action<ExecutionContext, object> callback;
+        private Action<NodeContext, object> callback;
         private Activity attachedActivity;
 
         public BoundaryEvent(string id, EventSource source, FlowNode node)
@@ -43,7 +43,7 @@ namespace Deveel.Workflows
             }
         }
 
-        private Task ReactAsync(ExecutionContext context, object state)
+        private Task ReactAsync(NodeContext context, object state)
         {
             if (Interrupting)
             {
@@ -53,7 +53,7 @@ namespace Deveel.Workflows
             return Node.ExecuteAsync(context);
         }
 
-        protected override Task<object> CreateStateAsync(ExecutionContext context)
+        protected override Task<object> CreateStateAsync(NodeContext context)
         {
             var eventContext = EventSource.NewEventContext(context);
             eventContext.Attach(callback);
@@ -61,7 +61,7 @@ namespace Deveel.Workflows
             return Task.FromResult<object>(new BoundaryEventState(eventContext, callback));
         }
 
-        protected override Task ExecuteNodeAsync(object state, ExecutionContext context)
+        protected override Task ExecuteNodeAsync(object state, NodeContext context)
         {
             var boundaryState = (BoundaryEventState)state;
             return boundaryState.EventContext.BeginAsync();
@@ -71,7 +71,7 @@ namespace Deveel.Workflows
 
         class BoundaryEventState : IDisposable
         {
-            public BoundaryEventState(EventContext context, Action<ExecutionContext, object> callback)
+            public BoundaryEventState(EventContext context, Action<NodeContext, object> callback)
             {
                 EventContext = context;
                 Callback = callback;
@@ -79,7 +79,7 @@ namespace Deveel.Workflows
 
             public EventContext EventContext { get; }
 
-            public Action<ExecutionContext, object> Callback { get; }
+            public Action<NodeContext, object> Callback { get; }
 
             public void Dispose()
             {
