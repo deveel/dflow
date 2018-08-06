@@ -26,7 +26,7 @@ namespace Deveel.Workflows.Errors
         {
             if (!events.ContainsKey(context.EventId))
             {
-                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.EventHandler.EventName, context.CancellationToken));
+                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.EventSource.EventName, context.CancellationToken));
                 events.Add(context.EventId, context);
             }
 

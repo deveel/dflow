@@ -39,7 +39,7 @@ namespace Deveel.Workflows
             var variables = await registry.GetVariablesAsync(context.CancellationToken);
             var executor = (IScriptingExecutor) state;
 
-            var globals = context.CreateScript();
+            var globals = context.CreateScriptContext();
 
             var result = executor.ExecuteAsync(globals);
 

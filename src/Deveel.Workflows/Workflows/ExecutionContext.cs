@@ -12,30 +12,27 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
 {
-    public sealed class ExecutionContext : IContext, IVariableContext
+    public sealed class ExecutionContext : ContextBase, IVariableContext
     {
         private readonly CancellationTokenSource tokenSource;
-        private IServiceScope scope;
 
         private List<BoundaryEvent> events;
 
         public ExecutionContext(IContext parent, FlowNode node)
+            : base(parent)
         {
-            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
-            scope = parent.CreateScope();
             Node = node;
 
             tokenSource = new CancellationTokenSource();
-            CancellationToken = tokenSource.Token;
 
             Process = FindProcess();
 
             Variables = new InMemoryVariableRegistry();
         }
 
-        public IContext Parent { get; }
-
         public ProcessContext Process { get; }
+
+        public IContext Parent => ParentContext;
 
         public FlowNode Node { get; }
 
@@ -51,7 +48,7 @@ namespace Deveel.Workflows
 
         public bool IsExecuting => Status == ExecutionStatus.Executing;
 
-        public CancellationToken CancellationToken { get; }
+        public override CancellationToken CancellationToken => tokenSource.Token;
 
         internal void AddEvent(BoundaryEvent boundaryEvent)
         {
@@ -63,7 +60,7 @@ namespace Deveel.Workflows
 
         private ProcessContext FindProcess()
         {
-            IContext context = Parent;
+            IContext context = ParentContext;
             while (context != null)
             {
                 if (context is ProcessContext)
@@ -91,10 +88,10 @@ namespace Deveel.Workflows
             ChangeStatus(ExecutionStatus.Failed, error);
 
             if (error is IError) {
-                var handler = this.GetService<IErrorSignaler>();
-                if (handler != null)
+                var signal = this.GetService<IErrorSignaler>();
+                if (signal != null)
                 {
-                    await handler.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceId, ((IError)error).Name), CancellationToken);
+                    await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceId, ((IError)error).Name), CancellationToken);
                 }
 
                 return true;
@@ -130,17 +127,17 @@ namespace Deveel.Workflows
             ChangeStatus(ExecutionStatus.Interrupted);
         }
 
-        public ExecutionContext CreateScope(FlowNode node)
+        public ExecutionContext CreateNodeContext(FlowNode node)
         {
             return new ExecutionContext(this, node);
         }
 
-        public ScriptContext CreateScript()
+        public ScriptContext CreateScriptContext()
         {
             return new ScriptContext(this);
         }
 
-        public async Task<ExecutionState> GetStateAsync()
+        internal async Task<ExecutionState> GetStateAsync()
         {
             DateTimeOffset timeStamp;
 
@@ -160,14 +157,12 @@ namespace Deveel.Workflows
             return state;
         }
 
-        object IServiceProvider.GetService(Type serviceType)
+        protected override void Dispose(bool disposing)
         {
-            return scope == null ? null : scope.ServiceProvider.GetService(serviceType);
-        }
+            if (disposing && IsExecuting)
+                Cancel();
 
-        public void Dispose()
-        {
-            scope?.Dispose();
+            base.Dispose(disposing);
         }
     }
 }

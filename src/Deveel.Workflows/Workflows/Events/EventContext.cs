@@ -5,36 +5,30 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows.Events
 {
-    public class EventContext : IContext {
+    public class EventContext : ContextBase {
         private Action<ExecutionContext, IEventArgument> callbacks;
-        private IServiceScope scope;
         private AutoResetEvent fireEvent;
         private object lastState;
 
-        public EventContext(EventSource handler, ExecutionContext parent)
+        public EventContext(ExecutionContext parent, EventSource source)
+            : base(parent)
         {
-            EventHandler = handler;
-            Parent = parent;
-            scope = parent.CreateScope();
+            EventSource = source;
 
             var processId = parent.Process.Id;
             var instanceId = parent.Process.InstanceId;
-            EventId = new EventId(processId, instanceId, handler.EventName);
+            EventId = new EventId(processId, instanceId, source.EventName);
 
             fireEvent = new AutoResetEvent(false);
         }
 
-        IContext IContext.Parent { get; }
-
-        public ExecutionContext Parent { get; }
-
-        public EventSource EventHandler { get; }
+        public EventSource EventSource { get; }
 
         public EventId EventId { get; }
 
-        public CancellationToken CancellationToken => Parent.CancellationToken;
+        public ExecutionContext Parent => (ExecutionContext)ParentContext;
         
-        internal void Attach(Action<ExecutionContext, object> callback)
+        internal void Attach(Action<ExecutionContext, IEventArgument> callback)
         {
             OnAttach(callback);
         }
@@ -51,7 +45,7 @@ namespace Deveel.Workflows.Events
             }
         }
 
-        internal void Detach(Action<ExecutionContext, object> callback)
+        internal void Detach(Action<ExecutionContext, IEventArgument> callback)
         {
             OnDetach(callback);
         }
@@ -62,14 +56,9 @@ namespace Deveel.Workflows.Events
                 callbacks = (Action<ExecutionContext, IEventArgument>)Delegate.Remove(callbacks, callback);
         }
 
-        public object GetService(Type serviceType)
-        {
-            return scope.ServiceProvider.GetService(serviceType);
-        }
-
         internal Task BeginAsync()
         {
-            return EventHandler.AttachAsync(this);
+            return EventSource.AttachAsync(this);
         }
 
         internal async Task FireAsync(IEventArgument state)
@@ -95,12 +84,16 @@ namespace Deveel.Workflows.Events
             return lastState;
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            if (EventHandler != null)
-                EventHandler.DetachAsync(this).Wait();
+            if (disposing)
+            {
+                if (EventSource != null)
+                    EventSource.DetachAsync(this).Wait();
 
-            scope?.Dispose();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }

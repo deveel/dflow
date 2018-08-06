@@ -41,7 +41,7 @@ context.SetVariableAsync(""c"", i).Wait();
 
             var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
 
-            var globals = context.CreateScript();
+            var globals = context.CreateScriptContext();
             await globals.SetVariableAsync("a", 2);
 
             var result = await executor.ExecuteAsync(globals);
@@ -63,7 +63,7 @@ vars.b = i;
 
             var executor = engine.CreateExecutor(code, ScriptInfo.Generate(context));
 
-            var globals = context.CreateScript();
+            var globals = context.CreateScriptContext();
             await globals.SetVariableAsync("a", 2);
             await globals.SetVariableAsync("b", -2);
 

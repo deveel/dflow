@@ -27,7 +27,7 @@ namespace Deveel.Workflows
 
         internal virtual ExecutionContext CreateScope(ExecutionContext parent)
         {
-            return parent.CreateScope(this);
+            return parent.CreateNodeContext(this);
         }
 
         internal async Task ExecuteAsync(ExecutionContext context)

@@ -7,12 +7,12 @@ namespace Deveel.Workflows
 {
     public sealed class CatchEvent : FlowNode
     {
-        private readonly EventSource handler;
+        private readonly EventSource source;
 
-        public CatchEvent(string id, EventSource handler, string variableName)
+        public CatchEvent(string id, EventSource source, string variableName)
         : base(id)
         {
-            this.handler = handler;
+            this.source = source;
             VariableName = variableName;
         }
 
@@ -27,7 +27,7 @@ namespace Deveel.Workflows
 
         protected override async Task ExecuteNodeAsync(object state, ExecutionContext context)
         {
-            using (var eventContext = handler.NewEventContext(context))
+            using (var eventContext = source.NewEventContext(context))
             {
                 eventContext.Attach(async (c, s) => await ReactAsync(state, c));
                 await eventContext.BeginAsync();

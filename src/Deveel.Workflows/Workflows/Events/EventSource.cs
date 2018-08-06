@@ -21,7 +21,7 @@ namespace Deveel.Workflows.Events
 
         protected virtual EventContext OnNewEventContext(ExecutionContext context)
         {
-            return new EventContext(this, context);
+            return new EventContext(context, this);
         }
 
         internal EventContext NewEventContext(ExecutionContext context)

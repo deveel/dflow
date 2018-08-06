@@ -8,41 +8,31 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows
 {
-    public sealed class ProcessContext : IContext, IVariableContext
+    public sealed class ProcessContext : ContextBase, IVariableContext
     {
-        private IServiceScope scope;
         private CancellationTokenSource tokenSource;
         private List<ExecutionContext> currentContexts;
 
         internal ProcessContext(SystemContext parent, Process process, IActor actor, EventSource trigger, string instanceId)
+            : base(parent)
         {
-            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
             Process = process;
             Actor = actor;
             Trigger = trigger;
-            scope = parent.CreateScope();
             InstanceId = instanceId;
 
             tokenSource = new CancellationTokenSource();
-            CancellationToken = tokenSource.Token;
 
             currentContexts = new List<ExecutionContext>();
         }
 
-        object IServiceProvider.GetService(Type serviceType)
-        {
-            return scope.ServiceProvider.GetService(serviceType);
-        }
-
-        public IContext Parent { get; }
-
-        public CancellationToken CancellationToken { get; }
+        public override CancellationToken CancellationToken => tokenSource.Token;
 
         public string InstanceId { get; }
 
         public Process Process { get; }
 
-        public IVariableRegistry Variables => scope.ServiceProvider.GetRequiredService<IVariableRegistry>();
+        public IVariableRegistry Variables => this.GetRequiredService<IVariableRegistry>();
 
         public ProcessStatus Status { get; private set; }
 
@@ -96,10 +86,12 @@ namespace Deveel.Workflows
             }
         }
 
-        public void Dispose()
+        protected override void Dispose(bool disposing)
         {
-            Cancel();
-            scope?.Dispose();
+            if (disposing)
+                Cancel();
+
+            base.Dispose(disposing);
         }
     }
 }
