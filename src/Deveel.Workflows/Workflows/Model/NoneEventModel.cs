@@ -7,7 +7,7 @@ namespace Deveel.Workflows.Model
     {
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
-            return new EventNode(Id, new NoneEvent(Name));
+            return new RiseEvent(Id, new NoneEventRise(), new NoneEventArgument());
         }
     }
 }

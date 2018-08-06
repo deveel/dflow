@@ -1,14 +1,17 @@
-﻿using System;
+﻿using Deveel.Workflows.Events;
+using System;
 using System.Collections.Generic;
 
 namespace Deveel.Workflows.Messaging
 {
-    public sealed class Message
+    public sealed class Message : IEventArgument
     {
         public Message()
         {
             Metadata = new Dictionary<string, object>();
         }
+
+        EventType IEventArgument.EventType => EventType.Message;
 
         public string Name { get; }
 

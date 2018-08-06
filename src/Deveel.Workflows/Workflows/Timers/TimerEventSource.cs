@@ -18,7 +18,7 @@ namespace Deveel.Workflows.Timers
 
         protected override Task AttachContextAsync(EventContext context)
         {
-            var timer = (TimerEvent)context.Event;
+            var timer = (TimerEventHandler)context.EventHandler;
             var scheduleInfo = timer.ScheduleInfo;
 
             return scheduler.ScheduleAsync(context.EventId.ToString(), scheduleInfo, new ScheduleCallback(context), context.CancellationToken);

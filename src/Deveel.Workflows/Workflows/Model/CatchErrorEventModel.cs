@@ -4,15 +4,17 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Deveel.Workflows.Model
 {
-    public sealed class ErrorEventModel : EventModel
+    public sealed class CatchErrorEventModel : EventModel
     {
+        public string ErrorVariableName { get; set; }
+
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
             var errorSignal = context.Context.GetRequiredService<IErrorHandler>();
             var source = new ErrorEventSource(errorSignal);
             var errorEvent = new ErrorEventHandler(source, Name);
 
-            return new EventNode(Id, errorEvent);
+            return new CatchEvent(Id, errorEvent, ErrorVariableName);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Deveel.Workflows
             {
                 BoundaryEvents =
                {
-                   new BoundaryEvent(new TimerEvent(source, "timer1", new ScheduleInfo
+                   new BoundaryEvent(new TimerEventHandler(source, "timer1", new ScheduleInfo
                    {
 
                        Duration = TimeSpan.FromMilliseconds(200)

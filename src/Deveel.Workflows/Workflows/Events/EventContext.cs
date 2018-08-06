@@ -6,20 +6,20 @@ using System.Threading.Tasks;
 namespace Deveel.Workflows.Events
 {
     public class EventContext : IContext {
-        private Action<ExecutionContext, object> callbacks;
+        private Action<ExecutionContext, IEventArgument> callbacks;
         private IServiceScope scope;
         private AutoResetEvent fireEvent;
         private object lastState;
 
-        public EventContext(FlowEventHandler @event, ExecutionContext parent)
+        public EventContext(FlowEventHandler handler, ExecutionContext parent)
         {
-            Event = @event;
+            EventHandler = handler;
             Parent = parent;
             scope = parent.CreateScope();
 
             var processId = parent.Process.Id;
             var instanceId = parent.Process.InstanceId;
-            EventId = new EventId(processId, instanceId, @event.EventName);
+            EventId = new EventId(processId, instanceId, handler.EventName);
 
             fireEvent = new AutoResetEvent(false);
         }
@@ -28,7 +28,7 @@ namespace Deveel.Workflows.Events
 
         public ExecutionContext Parent { get; }
 
-        public FlowEventHandler Event { get; }
+        public FlowEventHandler EventHandler { get; }
 
         public EventId EventId { get; }
 
@@ -39,7 +39,7 @@ namespace Deveel.Workflows.Events
             OnAttach(callback);
         }
 
-        protected virtual void OnAttach(Action<ExecutionContext, object> callback)
+        protected virtual void OnAttach(Action<ExecutionContext, IEventArgument> callback)
         {
             if (callbacks == null)
             {
@@ -47,7 +47,7 @@ namespace Deveel.Workflows.Events
             }
             else
             {
-                callbacks = (Action<ExecutionContext, object>)Delegate.Combine(callbacks, callback);
+                callbacks = (Action<ExecutionContext, IEventArgument>)Delegate.Combine(callbacks, callback);
             }
         }
 
@@ -56,10 +56,10 @@ namespace Deveel.Workflows.Events
             OnDetach(callback);
         }
 
-        protected virtual void OnDetach(Action<ExecutionContext, object> callback)
+        protected virtual void OnDetach(Action<ExecutionContext, IEventArgument> callback)
         {
             if (callbacks != null)
-                callbacks = (Action<ExecutionContext, object>)Delegate.Remove(callbacks, callback);
+                callbacks = (Action<ExecutionContext, IEventArgument>)Delegate.Remove(callbacks, callback);
         }
 
         public object GetService(Type serviceType)
@@ -69,17 +69,17 @@ namespace Deveel.Workflows.Events
 
         internal Task BeginAsync()
         {
-            return Event.EventSource.AttachAsync(this);
+            return EventHandler.EventSource.AttachAsync(this);
         }
 
-        internal async Task FireAsync(object state)
+        internal async Task FireAsync(IEventArgument state)
         {
             await OnFired(state);
 
             fireEvent.Set();
         }
 
-        protected virtual Task OnFired(object state)
+        protected virtual Task OnFired(IEventArgument state)
         {
             callbacks?.Invoke(Parent, state);
             lastState = state;
@@ -97,8 +97,8 @@ namespace Deveel.Workflows.Events
 
         public void Dispose()
         {
-            if (Event != null)
-                Event.EventSource.DetachAsync(this).Wait();
+            if (EventHandler != null)
+                EventHandler.EventSource.DetachAsync(this).Wait();
 
             scope?.Dispose();
         }
