@@ -6,6 +6,7 @@ namespace Deveel.Workflows
     {
         Task,
         Process,
+        Transaction,
         Gateway,
         Event,
         BoundaryEvent

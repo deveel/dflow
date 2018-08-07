@@ -79,7 +79,7 @@ namespace Deveel.Workflows
         {
             const string script = @"
 int b;
-for(int i = 0; i < a; i++) {
+for(int i = 0; i < vars.a; i++) {
 b = i+1;
 }";
             var services = new ServiceCollection();

@@ -32,7 +32,7 @@ namespace Deveel.Workflows
             return new MultiInstanceState(state, count);
         }
 
-        protected override Task ExecuteNodeAsync(object state, NodeContext context)
+        protected override Task ExecuteActivityAsync(ActivityContext context, object state)
         {
             context.CancellationToken.ThrowIfCancellationRequested();
 

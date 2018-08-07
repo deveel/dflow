@@ -7,9 +7,10 @@ namespace Deveel.Workflows
     public sealed class ProcessSequence : IEnumerable<FlowNode>
     {
         private readonly LinkedList<FlowNode> nodes;
+        private readonly ISequenceHandler handler;
 
-        internal ProcessSequence()
-        {
+        internal ProcessSequence(ISequenceHandler handler) {
+            this.handler = handler;
             nodes = new LinkedList<FlowNode>();
         }
 
@@ -42,6 +43,7 @@ namespace Deveel.Workflows
             if (Exists(node.Id))
                 throw new ArgumentException();
 
+            handler.OnNodeAttached(node);
             nodes.AddLast(node);
         }
 
@@ -52,6 +54,7 @@ namespace Deveel.Workflows
             if (listNode == null)
                 throw new ArgumentException();
 
+            handler.OnNodeAttached(node);
             nodes.AddAfter(listNode, node);
         }
 
@@ -62,6 +65,7 @@ namespace Deveel.Workflows
             if (listNode == null)
                 throw new ArgumentException();
 
+            handler.OnNodeAttached(node);
             nodes.AddBefore(listNode, node);
         }
 
@@ -71,11 +75,16 @@ namespace Deveel.Workflows
             if (node == null)
                 throw new ArgumentException($"None object with ID '{id}' in sequence");
 
+            handler.OnNodeDetached(node.Value);
             nodes.Remove(node);
         }
 
         public void Clear()
         {
+            foreach (var node in nodes) {
+                handler.OnNodeDetached(node);
+            }
+
             nodes.Clear();
         }
 

@@ -28,7 +28,7 @@ namespace Deveel.Workflows
             return await query.FindUserAsync(Assignee);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
+        protected override async Task ExecuteActivityAsync(ActivityContext context, object state)
         {
             var registry = context.GetRequiredService<IAssignmentRegistry>();
             var user = (User) state;

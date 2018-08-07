@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Threading;
 using System.Threading.Tasks;
-using Deveel.Workflows.States;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Deveel.Workflows
-{
-    public abstract class FlowNode
-    {
-        protected FlowNode(string id)
-        {
+namespace Deveel.Workflows {
+    public abstract class FlowNode {
+        private Action<FlowNode, NodeContext> failCallback;
+
+        protected FlowNode(string id) {
             Id = id;
         }
 
@@ -17,78 +13,34 @@ namespace Deveel.Workflows
 
         public abstract FlowNodeType NodeType { get; }
 
-        protected virtual Task<object> CreateStateAsync(NodeContext context)
-        {
+        protected virtual Task<object> CreateStateAsync(NodeContext context) {
             return Task.FromResult<object>(null);
         }
 
         internal Task<object> CallCreateStateAsync(NodeContext context)
             => CreateStateAsync(context);
 
-        internal virtual NodeContext CreateScope(NodeContext parent)
-        {
-            return parent.CreateScope(this);
+        internal async Task ExecuteAsync(NodeContext context) {
+            var state = await CreateStateAsync(context);
+            await ExecuteNodeAsync(state, context);
         }
 
-        internal async Task ExecuteAsync(NodeContext context)
-        {
-            if (context == null)
-                throw new ArgumentNullException(nameof(context));
-
-            var scope = CreateScope(context);
-
-            try
-            {
-                var state = await CreateStateAsync(context);
-
-                await scope.StartAsync();
-
-                await ExecuteNodeAsync(state, scope);
-
-                scope.Complete();
-            }
-            catch (FlowException ex)
-            {
-                if (!await scope.FailAsync(ex))
-                    throw;
-            }
-            catch (OperationCanceledException)
-            {
-                // ignore this
-            }
-            catch (Exception ex)
-            {
-                if (!await scope.FailAsync(ex))
-                    throw new FlowException("The execution of the node failed", ex);
-            }
-            finally
-            {
-                await RegisterState(scope);
-
-                scope.Dispose();
-            }
-
+        internal void AttachFailCallback(Action<FlowNode, NodeContext> callback) {
+            failCallback = (Action<FlowNode, NodeContext>) Delegate.Combine(failCallback, callback);
         }
 
-        private async Task RegisterState(NodeContext scope)
-        {
-            try
-            {
-                var registry = scope.GetService<IExecutionRegistry>();
-                if (registry != null)
-                await registry.RegisterAsync(await scope.GetStateAsync());
-            }
-            catch (Exception)
-            {
-                // TODO: log this error
-            }
+        internal void DetachFailCallback(Action<FlowNode, NodeContext> callback) {
+            if (failCallback != null)
+                failCallback = (Action<FlowNode, NodeContext>) Delegate.Remove(failCallback, callback);
+        }
 
+        internal void OnExecutionFailed(NodeContext context) {
+            failCallback?.Invoke(this, context);
         }
 
         protected abstract Task ExecuteNodeAsync(object state, NodeContext context);
 
-        internal Task CallExecuteNodeAsync(object state, NodeContext context)
-        {
+        internal Task CallExecuteNodeAsync(object state, NodeContext context) {
             return ExecuteNodeAsync(state, context);
         }
     }

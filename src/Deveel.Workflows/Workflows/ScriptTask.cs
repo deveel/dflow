@@ -33,15 +33,13 @@ namespace Deveel.Workflows
             return Task.FromResult<object>(executor);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
+        protected override async Task ExecuteActivityAsync(ActivityContext context, object state)
         {
-            var registry = context.GetRequiredService<IVariableRegistry>();
-            var variables = await registry.GetVariablesAsync(context.CancellationToken);
             var executor = (IScriptingExecutor) state;
 
             using (var scriptContext = new ScriptContext(context))
             {
-                var result = executor.ExecuteAsync(scriptContext);
+                var result = await executor.ExecuteAsync(scriptContext);
             }
 
                 // TODO: set the result in scope

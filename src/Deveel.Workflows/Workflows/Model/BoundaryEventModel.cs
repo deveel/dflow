@@ -12,7 +12,7 @@ namespace Deveel.Workflows.Model
 
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
-            var compiledEvent = EventSource.BuildSource(context, EventName);
+            var compiledEvent = EventSource.BuildSource(context);
 
             return new BoundaryEvent(Id, compiledEvent, Outgoing);
         }

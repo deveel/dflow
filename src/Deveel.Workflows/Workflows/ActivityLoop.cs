@@ -24,7 +24,7 @@ namespace Deveel.Workflows
             return Activity.CallCreateStateAsync(context);
         }
 
-        protected override async Task ExecuteNodeAsync(object state, NodeContext context)
+        protected override async Task ExecuteActivityAsync(ActivityContext context, object state)
         {
             do
             {

@@ -69,14 +69,22 @@ namespace Deveel.Workflows
         {
             ChangeStatus(ExecutionStatus.Failed, error);
 
-            if (error is IError) {
-                var signal = this.GetService<IErrorSignaler>();
-                if (signal != null)
+            try
+            {
+                if (error is IError)
                 {
-                    await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceKey, ((IError)error).Name), CancellationToken);
-                }
+                    var signal = this.GetService<IErrorSignaler>();
+                    if (signal != null)
+                    {
+                        await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceKey, ((IError)error).Name), CancellationToken);
+                    }
 
-                return true;
+                    return true;
+                }
+            }
+            finally
+            {
+                Node.OnExecutionFailed(this);
             }
 
             return false;

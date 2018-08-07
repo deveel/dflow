@@ -35,14 +35,7 @@ namespace Deveel.Workflows.Events
 
         protected virtual void OnAttach(Action<NodeContext, IEventArgument> callback)
         {
-            if (callbacks == null)
-            {
-                callbacks = callback;
-            }
-            else
-            {
-                callbacks = (Action<NodeContext, IEventArgument>)Delegate.Combine(callbacks, callback);
-            }
+             callbacks = (Action<NodeContext, IEventArgument>)Delegate.Combine(callbacks, callback);
         }
 
         internal void Detach(Action<NodeContext, IEventArgument> callback)

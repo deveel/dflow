@@ -13,7 +13,7 @@ namespace Deveel.Workflows.Model
 
         public string Date { get; set; }
 
-        internal override EventSource BuildSource(ModelBuildContext context, string eventName)
+        internal override EventSource BuildSource(ModelBuildContext context)
         {
             var scheduler = context.Context.GetRequiredService<IJobScheduler>();
             var scheduleInfo = new ScheduleInfo
@@ -23,7 +23,7 @@ namespace Deveel.Workflows.Model
                 Date = String.IsNullOrEmpty(Date) ? (DateTimeOffset?)null : DateTimeOffset.Parse(Date)
             };
 
-            return new TimerEventSource(scheduler, eventName, scheduleInfo);
+            return new TimerEventSource(scheduler, EventName, scheduleInfo);
         }
     }
 }

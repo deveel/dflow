@@ -18,7 +18,7 @@ namespace Deveel.Workflows
 
         public ITaskExecutor Executor { get; }
 
-        protected override Task ExecuteNodeAsync(object state, NodeContext context)
+        protected override Task ExecuteActivityAsync(ActivityContext context, object state)
         {
             return Executor.ExecuteAsync(context);
         }

@@ -4,12 +4,12 @@ using System.Threading.Tasks;
 
 namespace Deveel.Workflows
 {
-    public sealed class Process : IDisposable
+    public sealed class Process : ISequenceHandler, IDisposable
     {
         public Process(ProcessInfo processInfo)
         {
             ProcessInfo = processInfo;
-            Sequence = new ProcessSequence();
+            Sequence = new ProcessSequence(this);
         }
 
         public ProcessSequence Sequence { get; }
@@ -35,6 +35,14 @@ namespace Deveel.Workflows
                     await obj.ExecuteAsync(executionContext);
                 }
             }
+        }
+
+        void ISequenceHandler.OnNodeAttached(FlowNode node)
+        {
+        }
+
+        void ISequenceHandler.OnNodeDetached(FlowNode node)
+        {
         }
     }
 }
