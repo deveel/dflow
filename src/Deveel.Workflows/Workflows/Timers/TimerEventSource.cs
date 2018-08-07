@@ -9,8 +9,8 @@ namespace Deveel.Workflows.Timers
     {
         private IJobScheduler scheduler;
 
-        public TimerEventSource(IJobScheduler scheduler, string eventName, ScheduleInfo scheduleInfo)
-            : base(eventName)
+        public TimerEventSource(IJobScheduler scheduler, string id, ScheduleInfo scheduleInfo)
+        : base(id)
         {
             this.scheduler = scheduler;
             ScheduleInfo = scheduleInfo;

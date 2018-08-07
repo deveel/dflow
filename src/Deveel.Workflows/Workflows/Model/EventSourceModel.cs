@@ -6,7 +6,7 @@ namespace Deveel.Workflows.Model
 {
     public abstract class EventSourceModel
     {
-        public string EventName { get; set; }
+        public string Id { get; set; }
 
         internal abstract EventSource BuildSource(ModelBuildContext context);
     }

@@ -20,11 +20,11 @@ namespace Deveel.Workflows.Errors
         {
             const string processId = "proc1";
             var instanceId = Guid.NewGuid().ToString();
-            var error = new ThrownError(processId, instanceId, "error");
+            var error = new ThrownError(processId, instanceId, "error", "9400");
 
             await signal.ThrowErrorAsync(error, CancellationToken.None);
 
-            var thrownError = await handler.CatchErrorAsync(processId, instanceId, "error", CancellationToken.None);
+            var thrownError = await handler.CatchErrorAsync(processId, instanceId, "9400", CancellationToken.None);
 
             Assert.NotNull(thrownError);
         }

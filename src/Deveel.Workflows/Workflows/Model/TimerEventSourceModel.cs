@@ -23,7 +23,7 @@ namespace Deveel.Workflows.Model
                 Date = String.IsNullOrEmpty(Date) ? (DateTimeOffset?)null : DateTimeOffset.Parse(Date)
             };
 
-            return new TimerEventSource(scheduler, EventName, scheduleInfo);
+            return new TimerEventSource(scheduler, Id, scheduleInfo);
         }
     }
 }

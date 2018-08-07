@@ -12,21 +12,26 @@ namespace Deveel.Workflows.Errors
         private Dictionary<EventId, EventContext> events;
         private Dictionary<EventId, Task> waiters;
 
-        public ErrorEventSource(IErrorHandler handler, string eventName)
-            : base(eventName)
-        {
+        public ErrorEventSource(IErrorHandler handler, string id, string errorName, string errorCode)
+            : base(id) {
             this.handler = handler;
+            ErrorName = errorName;
+            ErrorCode = errorCode;
             events = new Dictionary<EventId, EventContext>();
             waiters = new Dictionary<EventId, Task>();
         }
 
         public override EventType EventType => EventType.Error;
 
+        public string ErrorName { get; }
+
+        public  string ErrorCode { get; }
+
         protected override Task AttachContextAsync(EventContext context)
         {
             if (!events.ContainsKey(context.EventId))
             {
-                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.EventSource.EventName, context.CancellationToken));
+                waiters[context.EventId] = Task.Run(() => WaitForErrorAsync(context.EventId, context.CancellationToken));
                 events.Add(context.EventId, context);
             }
 
@@ -49,9 +54,9 @@ namespace Deveel.Workflows.Errors
             return Task.CompletedTask;
         }
 
-        private async Task WaitForErrorAsync(EventId eventId, string errorName, CancellationToken cancellationToken)
+        private async Task WaitForErrorAsync(EventId eventId, CancellationToken cancellationToken)
         {
-            var error = await handler.CatchErrorAsync(eventId.ProcessId, eventId.InstanceKey, errorName, cancellationToken);
+            var error = await handler.CatchErrorAsync(eventId.ProcessId, eventId.InstanceKey, ErrorCode, cancellationToken);
 
             if (error != null && events.TryGetValue(eventId, out EventContext errorEvent))
             {

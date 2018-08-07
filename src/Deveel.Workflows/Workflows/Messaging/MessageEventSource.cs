@@ -4,65 +4,56 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Deveel.Workflows.Messaging
-{
-    public sealed class MessageEventSource : EventSource
-    {
+namespace Deveel.Workflows.Messaging {
+    public sealed class MessageEventSource : EventSource {
         private IMessageReceiver receiver;
-        private Dictionary<MessageSubscription, Task> waiters;
-        private Dictionary<MessageSubscription, EventContext> events;
+        private Dictionary<EventId, Task> waiters;
+        private Dictionary<EventId, EventContext> events;
 
-        public MessageEventSource(IMessageReceiver receiver, string eventName, MessageSubscription subscription)
-            : base(eventName)
-        {
+        public MessageEventSource(string id, IMessageReceiver receiver, MessageSubscription subscription)
+            : base(id) {
             this.receiver = receiver;
             Subscription = subscription;
 
-            waiters = new Dictionary<MessageSubscription, Task>();
-            events = new Dictionary<MessageSubscription, EventContext>();
+            waiters = new Dictionary<EventId, Task>();
+            events = new Dictionary<EventId, EventContext>();
         }
 
         public override EventType EventType => EventType.Message;
 
         public MessageSubscription Subscription { get; }
 
-        protected override Task AttachContextAsync(EventContext context)
-        {
-            if (!waiters.ContainsKey(Subscription))
-            {
-                waiters[Subscription] = Task.Run(async () => await ReceiveAsync(Subscription, context.CancellationToken));
+        protected override Task AttachContextAsync(EventContext context) {
+            if (!events.ContainsKey(context.EventId)) {
+                waiters[context.EventId] =
+                    Task.Run(async () => await ReceiveAsync(context.EventId, context.CancellationToken));
+                events.Add(context.EventId, context);
             }
 
             return Task.CompletedTask;
         }
 
-        private async Task ReceiveAsync(MessageSubscription subscription, CancellationToken cancellationToken)
-        {
-            var message = await receiver.ReceiveAsync(subscription, cancellationToken);
+        private async Task ReceiveAsync(EventId eventId, CancellationToken cancellationToken) {
+            var message = await receiver.ReceiveAsync(Subscription, cancellationToken);
 
-            EventContext context;
-            if (events.TryGetValue(subscription, out context))
+            if (events.TryGetValue(eventId, out var context))
                 await context.FireAsync(message);
         }
 
-        protected override Task DetachContextAsync(EventContext context)
-        {
-            if (events.ContainsKey(Subscription))
-            {
-                var waiter = waiters[Subscription];
+        protected override Task DetachContextAsync(EventContext context) {
+            if (events.ContainsKey(context.EventId)) {
+                var waiter = waiters[context.EventId];
                 waiter.Dispose();
 
-                waiters.Remove(Subscription);
-                events.Remove(Subscription);
+                waiters.Remove(context.EventId);
+                events.Remove(context.EventId);
             }
 
             return Task.CompletedTask;
         }
 
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
                 foreach (var waiter in waiters.Values)
                     waiter.Dispose();
 

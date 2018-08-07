@@ -26,7 +26,7 @@ namespace Deveel.Workflows
             events.Add(boundaryEvent);
         }
 
-        internal async override Task StartAsync()
+        internal override async Task StartAsync()
         {
             await base.StartAsync();
 

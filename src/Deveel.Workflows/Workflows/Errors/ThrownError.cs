@@ -6,11 +6,12 @@ namespace Deveel.Workflows.Errors
 {
     public sealed class ThrownError : IError, IEventArgument
     {
-        public ThrownError(string processId, string instanceId, string errorName)
+        public ThrownError(string processId, string instanceId, string errorName, string errorCode)
         {
             ProcessId = processId;
             InstanceId = instanceId;
             Name = errorName;
+            Code = errorCode;
 
             ErrorData = new Dictionary<string, object>();
         }
@@ -20,6 +21,8 @@ namespace Deveel.Workflows.Errors
         public string InstanceId { get; }
 
         public string Name { get; }
+
+        public string Code { get; }
 
         EventType IEventArgument.EventType => EventType.Error;
 

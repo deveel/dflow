@@ -26,8 +26,6 @@ namespace Deveel.Workflows
 
         public EventType EventType => EventSource.EventType;
 
-        public string EventName => EventSource.EventName;
-
         internal void AttachTo(Activity activity)
         {
             attachedActivity = activity;

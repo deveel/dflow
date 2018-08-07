@@ -6,15 +6,12 @@ using Deveel.Workflows.States;
 using Deveel.Workflows.Variables;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Deveel.Workflows
-{
-    public class NodeContext : ContextBase
-    {
+namespace Deveel.Workflows {
+    public class NodeContext : ContextBase {
         private readonly CancellationTokenSource tokenSource;
 
         public NodeContext(IContext parent, FlowNode node)
-            : base(parent)
-        {
+            : base(parent) {
             Node = node;
 
             tokenSource = new CancellationTokenSource();
@@ -40,13 +37,12 @@ namespace Deveel.Workflows
 
         public override CancellationToken CancellationToken => tokenSource.Token;
 
-        private ProcessContext FindProcess()
-        {
+        private ProcessContext FindProcess() {
             IContext context = ParentContext;
-            while (context != null)
-            {
+
+            while (context != null) {
                 if (context is ProcessContext)
-                    return (ProcessContext)context;
+                    return (ProcessContext) context;
 
                 context = context.Parent;
             }
@@ -54,8 +50,7 @@ namespace Deveel.Workflows
             throw new InvalidOperationException();
         }
 
-        private void ChangeStatus(ExecutionStatus status, Exception error = null)
-        {
+        private void ChangeStatus(ExecutionStatus status, Exception error = null) {
             Status = status;
             Error = error;
 
@@ -65,25 +60,22 @@ namespace Deveel.Workflows
                 FinishedAt = DateTimeOffset.UtcNow;
         }
 
-        internal async Task<bool> FailAsync(Exception error)
-        {
+        internal async Task<bool> FailAsync(Exception error) {
             ChangeStatus(ExecutionStatus.Failed, error);
 
-            try
-            {
-                if (error is IError)
-                {
+            try {
+                if (error is IError) {
                     var signal = this.GetService<IErrorSignaler>();
-                    if (signal != null)
-                    {
-                        await signal.ThrowErrorAsync(new ThrownError(Process.Id, Process.InstanceKey, ((IError)error).Name), CancellationToken);
+
+                    if (signal != null) {
+                        await signal.ThrowErrorAsync(
+                            new ThrownError(Process.Id, Process.InstanceKey, ((IError) error).Name, ((IError)error).Code), CancellationToken);
                     }
 
                     return true;
                 }
             }
-            finally
-            {
+            finally {
                 Node.OnExecutionFailed(this);
             }
 
@@ -93,38 +85,34 @@ namespace Deveel.Workflows
         internal void Complete()
             => ChangeStatus(ExecutionStatus.Completed);
 
-        internal virtual Task StartAsync()
-        {
+        internal virtual Task StartAsync() {
             ChangeStatus(ExecutionStatus.Executing);
+
             return Task.CompletedTask;
         }
 
-        internal void Cancel()
-        {
+        internal void Cancel() {
             tokenSource.Cancel();
 
             ChangeStatus(ExecutionStatus.Canceled);
         }
 
-        internal void Interrupt()
-        {
+        internal void Interrupt() {
             // TODO: anything else to do here?
             ChangeStatus(ExecutionStatus.Interrupted);
         }
 
-        public NodeContext CreateScope(FlowNode node)
-        {
+        public NodeContext CreateScope(FlowNode node) {
             return new NodeContext(this, node);
         }
 
-        internal async Task<ExecutionState> GetStateAsync()
-        {
+        internal async Task<ExecutionState> GetStateAsync() {
             DateTimeOffset timeStamp;
 
-            if (Status == ExecutionStatus.Executing)
-            {
+            if (Status == ExecutionStatus.Executing) {
                 timeStamp = StartedAt ?? DateTimeOffset.UtcNow;
-            } else {
+            }
+            else {
                 timeStamp = FinishedAt ?? DateTimeOffset.UtcNow;
             }
 
@@ -137,8 +125,7 @@ namespace Deveel.Workflows
             return state;
         }
 
-        protected override void Dispose(bool disposing)
-        {
+        protected override void Dispose(bool disposing) {
             if (disposing && IsExecuting)
                 Cancel();
 

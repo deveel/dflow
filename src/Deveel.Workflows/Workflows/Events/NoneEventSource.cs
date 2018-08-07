@@ -4,13 +4,12 @@ namespace Deveel.Workflows.Events
 {
     public sealed class NoneEventSource : EventSource
     {
-        public NoneEventSource(string eventName) : base(eventName)
-        {
+        public NoneEventSource(string id)
+            : base(id) {
         }
 
         public NoneEventSource()
-            : this(null)
-        {
+            : this(null) {
         }
 
         static NoneEventSource()

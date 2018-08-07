@@ -28,55 +28,84 @@ namespace Deveel.Workflows
             return null;
         }
 
-        private bool Exists(string objName)
+        public bool Contains(string nodeId)
         {
-            return FindNode(objName) != null;
+            return FindNode(nodeId) != null;
+        }
+
+        private bool Exists(FlowNode node) {
+            var current = handler;
+
+            while (current != null) {
+                if (current.NodeExists(node))
+                    return true;
+
+                current = current.Parent;
+            }
+
+            return false;
+        }
+
+        private void AssertNotExists(FlowNode node) {
+            if (Exists(node))
+                throw new FlowException("A node with the same ID already exists in the process context");
+        }
+
+        private void SetParentHandler(FlowNode node) {
+            if (node is ISequenceHandler)
+                ((ISequenceHandler) node).Parent = handler;
         }
 
         public void Add(FlowNode node)
         {
             if (node == null)
-            {
                 throw new ArgumentNullException(nameof(node));
-            }
 
-            if (Exists(node.Id))
-                throw new ArgumentException();
+            AssertNotExists(node);
+
+            SetParentHandler(node);
 
             handler.OnNodeAttached(node);
             nodes.AddLast(node);
         }
 
-        public void AddAfter(string objName, FlowNode node)
+        public void AddAfter(string nodeId, FlowNode node)
         {
-            var listNode = FindNode(objName);
+            var listNode = FindNode(nodeId);
 
             if (listNode == null)
-                throw new ArgumentException();
+                throw new FlowException($"Reference node '{nodeId}' was not found in the sequence");
+
+            AssertNotExists(node);
+            SetParentHandler(node);
 
             handler.OnNodeAttached(node);
             nodes.AddAfter(listNode, node);
         }
 
-        public void AddBefore(string objName, FlowNode node)
+        public void AddBefore(string nodeId, FlowNode node)
         {
-            var listNode = FindNode(objName);
+            var listNode = FindNode(nodeId);
 
             if (listNode == null)
-                throw new ArgumentException();
+                throw new FlowException($"Reference node '{nodeId}' was not found in the sequence");
+
+            AssertNotExists(node);
+            SetParentHandler(node);
 
             handler.OnNodeAttached(node);
             nodes.AddBefore(listNode, node);
         }
 
-        public void Remove(string id)
+        public void Remove(string nodeId)
         {
-            var node = FindNode(id);
-            if (node == null)
-                throw new ArgumentException($"None object with ID '{id}' in sequence");
+            var listNode = FindNode(nodeId);
 
-            handler.OnNodeDetached(node.Value);
-            nodes.Remove(node);
+            if (listNode == null)
+                throw new FlowException($"Reference node '{nodeId}' was not found in the sequence");
+
+            handler.OnNodeDetached(listNode.Value);
+            nodes.Remove(listNode);
         }
 
         public void Clear()

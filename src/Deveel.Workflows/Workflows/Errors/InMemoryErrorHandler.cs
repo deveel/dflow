@@ -18,14 +18,14 @@ namespace Deveel.Workflows.Errors
 
         Task IErrorSignalHandler.SignalAsync(ThrownError error, CancellationToken cancellationToken)
         {
-            var key = new ErrorKey(error.ProcessId, error.InstanceId, error.Name);
+            var key = new ErrorKey(error.ProcessId, error.InstanceId, error.Code);
             errors[key] = error;
             return Task.CompletedTask;
         }
 
         private ThrownError WaitForError(ErrorKey key, CancellationToken cancellationToken)
         {
-            ThrownError error = null;
+            ThrownError error;
             while (!errors.TryGetValue(key, out error))
             {
                 if (cancellationToken.IsCancellationRequested)
@@ -36,11 +36,11 @@ namespace Deveel.Workflows.Errors
             return error;
         }
 
-        public Task<ThrownError> CatchErrorAsync(string processId, string instanceId, string errorName, CancellationToken cancellationToken)
+        public Task<ThrownError> CatchErrorAsync(string processId, string instanceId, string errorCode, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var errorKey = new ErrorKey(processId, instanceId, errorName);
+            var errorKey = new ErrorKey(processId, instanceId, errorCode);
 
             if (!waiters.TryGetValue(errorKey, out Task<ThrownError> waitTask))
             {
@@ -55,24 +55,26 @@ namespace Deveel.Workflows.Errors
 
         class ErrorKey : IEquatable<ErrorKey>
         {
-            public ErrorKey(string processId, string instanceId, string errorName)
+            public ErrorKey(string processId, string instanceId, string errorCode)
             {
                 ProcessId = processId;
                 InstanceId = instanceId;
-                ErrorName = errorName;
+                ErrorCode = errorCode;
             }
 
             public string ProcessId { get; }
 
             public string InstanceId { get; }
 
-            public string ErrorName { get; }
+            public string ErrorCode { get; }
 
-            public bool Equals(ErrorKey other)
-            {
+            public bool Equals(ErrorKey other) {
+                if (other == null)
+                    return false;
+
                 return ProcessId == other.ProcessId &&
                     InstanceId == other.InstanceId &&
-                    ErrorName == other.ErrorName;
+                    ErrorCode == other.ErrorCode;
             }
 
             public override bool Equals(object obj)
@@ -88,7 +90,7 @@ namespace Deveel.Workflows.Errors
                 var hashCode = 663944616;
                 hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ProcessId);
                 hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(InstanceId);
-                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ErrorName);
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ErrorCode);
                 return hashCode;
             }
         }

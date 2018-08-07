@@ -8,11 +8,14 @@ namespace Deveel.Workflows.Model
     {
         public string ErrorName { get; set; }
 
+        public string ErrorCode { get; set; }
+
         internal override FlowNode BuildNode(ModelBuildContext context)
         {
             var errorSignaler = context.Context.GetRequiredService<IErrorSignaler>();
 
-            return new ThrowEvent(Id, new ErrorEventRise(errorSignaler), new ThrownError(context.ProcessId, context.InstanceKey, ErrorName));
+            return new ThrowEvent(Id, new ErrorEventRise(errorSignaler),
+                new ThrownError(context.ProcessId, context.InstanceKey, ErrorName, ErrorCode));
         }
     }
 }

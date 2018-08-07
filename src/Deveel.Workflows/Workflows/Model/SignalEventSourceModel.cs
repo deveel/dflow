@@ -13,7 +13,7 @@ namespace Deveel.Workflows.Model
         {
             var registry = context.Context.GetRequiredService<ISignalRegistry>();
 
-            return new SignalEventSource(registry, SignalName);
+            return new SignalEventSource(registry, Id, SignalName);
         }
     }
 }

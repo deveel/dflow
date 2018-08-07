@@ -5,9 +5,8 @@ namespace Deveel.Workflows.Events
 {
     public abstract class EventSource : IDisposable
     {
-        protected EventSource(string eventName)
-        {
-            EventName = eventName;
+        protected EventSource(string id) {
+            Id = id;
         }
 
         ~EventSource()
@@ -15,9 +14,9 @@ namespace Deveel.Workflows.Events
             Dispose(false);
         }
 
-        public abstract EventType EventType { get; }
+        public string Id { get; }
 
-        public string EventName { get; }
+        public abstract EventType EventType { get; }
 
         protected virtual EventContext OnNewEventContext(NodeContext context)
         {

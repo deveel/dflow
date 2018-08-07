@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Deveel.Workflows
 {
-    public sealed class Process : ISequenceHandler, IDisposable
+    public sealed class Process : ISequenceHandler
     {
         public Process(ProcessInfo processInfo)
         {
@@ -16,9 +17,9 @@ namespace Deveel.Workflows
 
         public ProcessInfo ProcessInfo { get; }
 
-        public void Dispose()
-        {
-            
+        ISequenceHandler ISequenceHandler.Parent {
+            get => null;
+            set => throw new NotSupportedException();
         }
 
         public async Task RunAsync(ProcessContext context)
@@ -43,6 +44,10 @@ namespace Deveel.Workflows
 
         void ISequenceHandler.OnNodeDetached(FlowNode node)
         {
+        }
+
+        bool ISequenceHandler.NodeExists(FlowNode node) {
+            return Sequence.Contains(node.Id);
         }
     }
 }

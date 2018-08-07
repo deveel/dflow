@@ -8,6 +8,7 @@ namespace Deveel.Workflows.Events
         Timer,
         Message,
         Signal,
-        Error
+        Error,
+        Escalation
     }
 }
